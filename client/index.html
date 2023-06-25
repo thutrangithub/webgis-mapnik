@@ -8,31 +8,68 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap" rel="stylesheet">
+    
   </head>
   <body>
-    <!-- <form>
-      <label for="type">Geometry type &nbsp;</label>
-      <select id="type">
-        <option value="Point">Point</option>
-        <option value="LineString">LineString</option>
-        <option value="Polygon">Polygon</option>
-        <option value="Circle">Circle</option>
-      </select>
-    </form> -->
     <div id="content">
       <div id="menu">
+
+        <!-- Select mode -->
         <select id="mode">
           <option value="none">Select a vector tile</option>
           <option value="modify">Select a feature to modify</option>
           <option value="draw">Draw new features</option>
+          <option value="measure">Measure new features</option>
         </select>
-        <div id="selected">Select a vector tile to display it's info</div>
+
+        <!-- Button save after Modifying -->
+        <div id="dragged-feature-section" style="display: none;">
+          <label for="dragged-feature-count">Dragged Feature Count:</label>
+          <span id="dragged-feature-count">0</span>
+          <button id="save-button">Save</button>
+        </div>
+        <div id="selected" >Select a vector tile to display its info</div>
+        <div id="commit"></div>
+
+        <!-- Draw new feature -->
+        <form>
+          <div id="draw-feature-section" style="display: none;">
+            <label for="type">Draw new feature &nbsp;</label>
+            <div>
+              <select id="type">
+                <option value="None">None</option>
+                <option value="Point">Point</option>
+                <option value="LineString">LineString</option>
+                <option value="Polygon">Polygon</option>
+                <option value="Circle">Circle</option>
+              </select>
+              <input class="form-control" type="button" value="Undo" id="undo">
+            </div>
+          </div>
+
+        <!-- Measurement -->
+          <div id="measure-feature-section" style="display: none;">
+            <label for="typeMeasure">Measurement type &nbsp;</label>
+            <select id="typeMeasure">
+              <option value="None-Measure">None</option>
+              <option value="LineString">Length (LineString)</option>
+              <option value="Polygon">Area (Polygon)</option>
+            </select>
+            <!-- &nbsp;&nbsp;&nbsp;&nbsp; -->
+            </br>
+            <label for="segments">Show segment lengths:&nbsp;</label>
+            <input type="checkbox" id="segments" checked />
+            </br>
+            <label for="clear">Clear previous measure:&nbsp;</label>
+            <input type="checkbox" id="clear" checked />
+          </div>
+        </form>
       </div>
       <div id="map"></div>  
     </div>
     <span id="status">&nbsp;</span>
     <div id="options"></div>
-
-   
+    <script src="https://cdn.jsdelivr.net/npm/elm-pep@1.0.6/dist/elm-pep.js"></script>
+    <script type="module" src="index.js"></script>
   </body>
 </html>
