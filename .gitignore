@@ -1,2 +1,4 @@
 node_modules
 webpack.config.js
+/server/app.js
+/server/components/connectDb.js
