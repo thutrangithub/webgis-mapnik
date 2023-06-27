@@ -68,7 +68,7 @@ const vector = new VectorLayer({
 // def the layers to dispaly on the map
 const layers = [
   {
-    title: "Country (Viet Nam)",
+    title: "Bản đồ Việt Nam",
     shown: true,
     layer: new VectorTileLayer({
       // background: 'grey',
@@ -88,14 +88,14 @@ const layers = [
     }),
   },
   {
-    title: "z:x:y",
+    title: "Tọa độ z:x:y",
     shown: true,
     layer: new TileLayer({
       source: new TileDebug(),
     }),
   },
   {
-    title: "Layout",
+    title: "Nền",
     shown: true,
     layer: vector,
   },
@@ -192,7 +192,6 @@ var clickPoint;
 function handleDownEvent(evt) {
   clickPoint = JSON.parse(JSON.stringify(evt.coordinate));
   const map = evt.map;
-
   const feature = map.forEachFeatureAtPixel(evt.pixel, function (feature) {
     return feature;
   });
@@ -241,7 +240,6 @@ function handleDragEvent(evt) {
   // console.log("this.feature_", this.feature_)
 
   if (this.feature_.hasOwnProperty("getFlatCoordinates")) {
-    console.log(this.feature_);
     FlatCoordinates = this.feature_.getFlatCoordinates();
   }
 
@@ -307,14 +305,14 @@ function handleMoveEvent(evt) {
 function updateDraggedFeatureCount() {
   const countElement = document.getElementById("dragged-feature-count");
   countElement.textContent = draggedFeatureCount.toString();
-  console.log({ draggedFeatureIds });
   document.getElementById("dragged-ids").textContent =
-    "List feature id dragged: " + draggedFeatureIds.join(",");
+    "Danh sách id tính năng đã được kéo: " + draggedFeatureIds.join(",");
 }
+
 // init variable store polygon
 var FlatCoordinates = [];
+
 function handleUpEvent(evt) {
-  // console.log("drag stop")
   map.getLayers().forEach((layer) => {
     if (layer.getClassName() == "vectorLineLayer") {
       // console.log("delete layers");
@@ -325,6 +323,7 @@ function handleUpEvent(evt) {
   if (this.feature_ instanceof RenderFeature) {
     FlatCoordinates = this.feature_.getFlatCoordinates();
   }
+
   var coordinates = [[]];
   var i = 0;
   while (i < FlatCoordinates.length) {
@@ -368,10 +367,11 @@ function handleUpEvent(evt) {
   });
 
   //add the layers
+  if (this.feature_ instanceof Feature) {
+  }
+  const gid = this.feature_.getProperties().gid;
   map.addLayer(vectorCommitLayer);
   map.addLayer(vectorNewCommitLayer);
-
-  const gid = this.feature_.getProperties().gid;
 
   // if (deltaXTotal != 0 || deltaYTotal != 0) {
   //   try {
@@ -458,11 +458,15 @@ function handleUpEvent(evt) {
   //     console.log(error);
   //   }
   // }
-
+  if (gid) {
+    draggedFeatureIds.push(gid);
+  }
   if (deltaXTotal != 0 || deltaYTotal != 0) {
     // Thêm ID của feature vào mảng draggedFeatureIds
-    const featureId = this.feature_.getProperties().gid || this.feature_.ol_uid;
-    draggedFeatureIds.push(featureId);
+    // const featureId = this.feature_.getProperties().gid || this.feature_.ol_uid;
+    // if (gid) {
+    //   draggedFeatureIds.push(gid);
+    // }
     // Tăng giá trị draggedFeatureCount lên 1
     draggedFeatureCount += 1;
     updateDraggedFeatureCount();
@@ -490,9 +494,9 @@ function handleUpEvent(evt) {
   deltaXTotal = 0;
   deltaYTotal = 0;
 
-  if (map.getAllLayers().length > 2) {
-    map.removeLayer(map.getAllLayers()[2]);
-  }
+  // if (map.getAllLayers().length > 2) {
+  //   map.removeLayer(map.getAllLayers()[2]);
+  // }
 
   return false;
 }
@@ -606,21 +610,21 @@ map.on("click", function (e) {
 
     let titleDiv = document.createElement("div");
     titleDiv.appendChild(
-      document.createTextNode("Selected vector tiles data :")
+      document.createTextNode("Thông tin tính năng :")
     );
     dataDiv.appendChild(titleDiv);
     //Info of the selected vector tiles
     let Properties = f.getProperties();
     let data = [
-      "Country : " + Properties.COUNTRY,
+      "Quốc gia : " + Properties.COUNTRY,
       "ID : " + f.getId(),
-      "Area : " + Properties.ENGTYPE_1,
-      "gid : " + Properties.gid,
-      "gid0 : " + Properties.GID_0,
-      "gid1: " + Properties.GID_1,
-      "hasc_1: " + Properties.HASC_1,
-      "iso1 : " + Properties.ISO_1,
-      "region : " + Properties.NAME_1,
+      "Khu vực : " + Properties.ENGTYPE_1,
+      "Gid : " + Properties.gid,
+      "Gid0 : " + Properties.GID_0,
+      "Gid1: " + Properties.GID_1,
+      "Hasc_1: " + Properties.HASC_1,
+      "Iso1 : " + Properties.ISO_1,
+      "Vùng : " + Properties.NAME_1,
     ];
     for (e in data) {
       let div = document.createElement("div");
@@ -645,7 +649,7 @@ map.on("click", function (e) {
     objctx.closePath();
     objctx.fillStyle = "#ece8ae";
     objctx.fill();
-    dataDiv.appendChild(canvas);
+    // dataDiv.appendChild(canvas);
 
     document.getElementById("selected").appendChild(dataDiv);
 
@@ -657,6 +661,11 @@ map.on("click", function (e) {
   } else {
     status.innerHTML = "&nbsp;";
   }
+  // display info wrapper
+  if (document.getElementById("selected").hasChildNodes()) {
+    document.getElementById("selected").style.display = "block";
+  }
+
 });
 
 // Draw point, linestring, polygon, circle

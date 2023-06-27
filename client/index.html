@@ -11,65 +11,67 @@
     
   </head>
   <body>
+    <div class="title text-center p-4">
+      <h2>Bản đồ thông tin Việt Nam</h2>
+    </div>
     <div id="content">
-      <div id="menu">
-
+      
+      <div id="menu" class="p-4">
         <!-- Select mode -->
-        <select id="mode">
-          <option value="none">Select a vector tile</option>
-          <option value="modify">Select a feature to modify</option>
-          <option value="draw">Draw new features</option>
-          <option value="measure">Measure new features</option>
+        <select id="mode" class="form-control">
+          <option value="none">Chọn chức năng bản đồ</option>
+          <option value="modify">Chọn một tính năng để sửa đổi</option>
+          <option value="draw">Vẽ một tính năng mới</option>
+          <option value="measure">Đo lường các tính năng mới</option>
         </select>
 
         <!-- Button save after Modifying -->
-        <div id="dragged-feature-section" style="display: none;">
-          <label for="dragged-feature-count">Dragged Feature Count:</label>
+        <div id="dragged-feature-section" class="p-4 form-group" style="display: none;">
+          <label for="dragged-feature-count">Số lượng tính năng đã được kéo:</label>
           <span id="dragged-feature-count">0</span>
+          <br>
           <span id="dragged-ids"></span>
-          <button id="save-button">Save</button>
+          <button id="save-button">Lưu thông tin</button>
         </div>
-        <div id="selected" >Select a vector tile to display its info</div>
+        <div id="selected" class="form-group p-4"  style="display: none;"></div>
         <div id="commit"></div>
 
         <!-- Draw new feature -->
         <form>
-          <div id="draw-feature-section" style="display: none;">
-            <label for="type">Draw new feature &nbsp;</label>
-            <div>
-              <select id="type">
-                <option value="None">None</option>
-                <option value="Point">Point</option>
-                <option value="LineString">LineString</option>
-                <option value="Polygon">Polygon</option>
-                <option value="Circle">Circle</option>
+          <div id="draw-feature-section" class="form-group p-4" style="display: none;">
+            <label for="type" class="mb-4">Vẽ một tính năng mới &nbsp;</label>
+              <select id="type" class="form-control mb-4 mt-4">
+                <option value="None">Không</option>
+                <option value="Point">Điểm</option>
+                <option value="LineString">Đường</option>
+                <option value="Polygon">Đa giác</option>
+                <option value="Circle">Hình tròn</option>
               </select>
-              <input class="form-control" type="button" value="Undo" id="undo">
-            </div>
+              <button class="btn btn-primary f-right" id="undo">Quay lại</button>
           </div>
 
         <!-- Measurement -->
-          <div id="measure-feature-section" style="display: none;">
-            <label for="typeMeasure">Measurement type &nbsp;</label>
-            <select id="typeMeasure">
-              <option value="None-Measure">None</option>
-              <option value="LineString">Length (LineString)</option>
-              <option value="Polygon">Area (Polygon)</option>
+          <div id="measure-feature-section" class="form-group p-4" style="display: none;">
+            <label for="typeMeasure">Loại đo lường &nbsp;</label>
+            <select id="typeMeasure" class="form-control mt-4 mb-4">
+              <option value="None-Measure">Không</option>
+              <option value="LineString">Độ dài (Đường)</option>
+              <option value="Polygon">Vùng (Đa giác)</option>
             </select>
-            <!-- &nbsp;&nbsp;&nbsp;&nbsp; -->
             </br>
-            <label for="segments">Show segment lengths:&nbsp;</label>
+            <label for="segments" class="mb-4">Hiển thị độ dài đoạn: &nbsp;</label>
             <input type="checkbox" id="segments" checked />
             </br>
-            <label for="clear">Clear previous measure:&nbsp;</label>
+            <label for="clear" class="mb-4">Xóa số đo trước đó: &nbsp;</label>
             <input type="checkbox" id="clear" checked />
           </div>
         </form>
+        <div id="options"></div>
       </div>
       <div id="map"></div>  
     </div>
     <span id="status">&nbsp;</span>
-    <div id="options"></div>
+    
     <script src="https://cdn.jsdelivr.net/npm/elm-pep@1.0.6/dist/elm-pep.js"></script>
     <!-- <script type="module" src="index.js"></script> -->
   </body>
