@@ -8,7 +8,6 @@ const connectDb = require("./components/connectDb");
 const app = express();
 
 // app.use('/', express.static(path.join(__dirname, '../dist')));
-
 app.get("/api/vector/:layerId/:z/:x/:y", async (req, res) => {
   try {
     const map = new MapPackage();
@@ -28,7 +27,6 @@ app.get("/api/vector/:layerId/:z/:x/:y", async (req, res) => {
     res.send(err?.stack);
   }
 });
-
 app.listen(8000, () => {
   console.log("App is running...");
 });
