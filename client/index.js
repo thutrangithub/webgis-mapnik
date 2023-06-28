@@ -114,19 +114,31 @@ const map = new Map({
 // Checkbox
 const options = document.getElementById("options");
 layers.forEach((l) => {
-  const label = document.createElement("label");
-  options.appendChild(label);
+  // Create a div wrapper
+  const divWrapper = document.createElement("div");
 
+  // Add class to the div wrapper
+  divWrapper.classList.add("wrapper-class"); 
+
+  // Create the label element
+  const label = document.createElement("label");
+  divWrapper.appendChild(label);
+
+  // Create the input element
   const inp = document.createElement("input");
   inp.setAttribute("type", "checkbox");
   inp.checked = l.shown;
+
+  // Apply spacing using CSS
+  inp.style.marginRight = "5px";
   label.appendChild(inp);
 
   label.appendChild(document.createTextNode(l.title));
 
-  const space = document.createTextNode("\u00A0"); // Add a non-breaking space
-  label.appendChild(space);
+  // Add the div wrapper to the options element
+  options.appendChild(divWrapper);
 
+  // Add click event listener to the input element
   inp.addEventListener("click", () => {
     l.shown = !l.shown;
 
@@ -134,6 +146,7 @@ layers.forEach((l) => {
     else map.removeLayer(l.layer);
   });
 });
+
 
 // handle the choice of action
 const typeSelect = document.getElementById("type");
@@ -315,7 +328,6 @@ var FlatCoordinates = [];
 function handleUpEvent(evt) {
   map.getLayers().forEach((layer) => {
     if (layer.getClassName() == "vectorLineLayer") {
-      // console.log("delete layers");
       map.removeLayer(layer);
     }
   });
@@ -373,91 +385,6 @@ function handleUpEvent(evt) {
   map.addLayer(vectorCommitLayer);
   map.addLayer(vectorNewCommitLayer);
 
-  // if (deltaXTotal != 0 || deltaYTotal != 0) {
-  //   try {
-  //     //add the modification to the modifications array
-  //     modifications.push([gid, deltaXTotal, deltaYTotal]);
-  //     let counter = document.createElement("div");
-  //     counter.innerHTML = "number of modifications : " + modifications.length;
-
-  //     if (document.getElementById("commit").children.length) {
-  //       const featureId = this.feature_.getProperties().gid;
-  //       draggedFeatureIds.push(featureId);
-  //       // console.log("featureId", featureId)
-  //       // console.log("draggedFeatureIds", draggedFeatureIds)
-  //       // //update the counter of modifications
-  //       // document.getElementById("commit").removeChild(document.getElementById("commit").firstChild);
-  //       // document.getElementById("commit").prepend(counter);
-
-  //       // draggedFeatureIds.push(featureId);
-  //       // Tăng giá trị draggedFeatureCount lên 1
-  //       draggedFeatureCount += 1;
-  //       updateDraggedFeatureCount();
-  //     } else {
-  //       //add the counter of modifications
-  //       document.getElementById("commit").prepend(counter);
-
-  //       //add the textarea for the commit message
-  //       let modif = document.createElement("textarea");
-  //       modif.value = "your commit message";
-  //       modif.style.width = "100%";
-  //       document.getElementById("commit").appendChild(modif);
-
-  //       //add the commit button
-  //       let button = document.createElement("button");
-  //       button.style.width = "100%";
-  //       button.style.height = "20px";
-  //       button.innerHTML = "Commit changes";
-  //       button.onclick = function () {
-  //         try {
-  //           if (modifications.length == 0) {
-  //             alert("Nothing to commit");
-  //           } else if (modif.value == "your commit message") {
-  //             alert("You have to change the commit message!");
-  //           } else {
-  //             // console.log("you commit");
-  //             let requestOptions = {
-  //               method: "PUT",
-  //               headers: { "Content-Type": "application/json" },
-  //               body: JSON.stringify({
-  //                 message: modif.innerHTML,
-  //                 modifications: modifications,
-  //               }),
-  //             };
-
-  //             //fetch the modifications to the server
-  //             fetch("/commit/", requestOptions);
-
-  //             //clean the commit message and moficactions array
-  //             modifications = [];
-  //             document
-  //               .getElementById("commit")
-  //               .removeChild(document.getElementById("commit").firstChild);
-  //             counter.innerHTML =
-  //               "number of modifications : " + modifications.length;
-  //             document.getElementById("commit").prepend(counter);
-  //             modif.value = "your commit message";
-
-  //             //remove the local display of modifications
-  //             map.getLayers().forEach((layer) => {
-  //               if (layer.getClassName() == "vectorLineLayer") {
-  //                 map.removeLayer(layer);
-  //               }
-  //             });
-  //           }
-  //         } catch {
-  //           console.log("error while committing changes");
-  //         }
-
-  //         //refresh the map after the commit
-  //         map.getLayers().forEach((layer) => layer.getSource().refresh());
-  //       };
-  //       document.getElementById("commit").appendChild(button);
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // }
   if (gid) {
     draggedFeatureIds.push(gid);
   }
@@ -472,31 +399,10 @@ function handleUpEvent(evt) {
     updateDraggedFeatureCount();
   }
 
-  // const requestOptions = {
-  // 	method: 'PUT',
-  // 	headers: { 'Content-Type': 'application/json' },
-  // 	body: JSON.stringify({deltaXTotal:deltaXTotal,deltaYTotal:deltaYTotal})
-  // };
-  // const gid = this.feature_.getProperties().gid;
-  // if(deltaXTotal!=0 || deltaYTotal!=0){
-  // 	try{
-  // 		fetch('/translate/'+gid,
-  // 		requestOptions
-  // 	)
-  // 	}
-  // 	catch(error){
-  // 		console.log(error);
-  // 	}
-  // }
-
   this.coordinate_ = null;
   this.feature_ = null;
   deltaXTotal = 0;
   deltaYTotal = 0;
-
-  // if (map.getAllLayers().length > 2) {
-  //   map.removeLayer(map.getAllLayers()[2]);
-  // }
 
   return false;
 }
@@ -592,8 +498,10 @@ onChange();
 
 // display data of the clicked vector
 const status = document.getElementById("status");
+const popup = document.getElementById("popup");
 
 let selected = null;
+
 map.on("click", function (e) {
   while (document.getElementById("selected").firstChild) {
     document
@@ -606,52 +514,43 @@ map.on("click", function (e) {
   }
   map.forEachFeatureAtPixel(e.pixel, function (f) {
     selected = f;
-    let dataDiv = document.createElement("div");
-
-    let titleDiv = document.createElement("div");
-    titleDiv.appendChild(
-      document.createTextNode("Thông tin tính năng :")
-    );
-    dataDiv.appendChild(titleDiv);
-    //Info of the selected vector tiles
-    let Properties = f.getProperties();
+    // Tạo nội dung cho popup
+    let popupContent = document.createElement("div");
+    
+    let properties = f.getProperties();
     let data = [
-      "Quốc gia : " + Properties.COUNTRY,
-      "ID : " + f.getId(),
-      "Khu vực : " + Properties.ENGTYPE_1,
-      "Gid : " + Properties.gid,
-      "Gid0 : " + Properties.GID_0,
-      "Gid1: " + Properties.GID_1,
-      "Hasc_1: " + Properties.HASC_1,
-      "Iso1 : " + Properties.ISO_1,
-      "Vùng : " + Properties.NAME_1,
+      { label: "Quốc gia:", value: properties.COUNTRY },
+      { label: "Khu vực:", value: properties.ENGTYPE_1 },
+      { label: "Vùng:", value: properties.NAME_1 },
     ];
-    for (e in data) {
-      let div = document.createElement("div");
-      div.appendChild(document.createTextNode(data[e]));
-      dataDiv.appendChild(div);
+    
+    for (let i = 0; i < data.length; i++) {
+      let paragraph = document.createElement("p");
+      paragraph.classList.add("content-popup-class");
+    
+      let labelSpan = document.createElement("span");
+      labelSpan.classList.add("label-popup-class");
+      labelSpan.appendChild(document.createTextNode(data[i].label));
+    
+      let valueSpan = document.createElement("span");
+      valueSpan.classList.add("value-popup-class");
+      valueSpan.appendChild(document.createTextNode(" " + data[i].value));
+    
+      paragraph.appendChild(labelSpan);
+      paragraph.appendChild(valueSpan);
+    
+      popupContent.appendChild(paragraph);
     }
+    
 
-    //Display the selected country using canva
-    var canvas = document.createElement("canvas");
-    var objctx = canvas.getContext("2d");
-    objctx.beginPath();
-    // var points= f.getFlatCoordinates();
+    // Đặt nội dung cho popup
+    document.getElementById("popup-content").innerHTML = "";
+    document.getElementById("popup-content").appendChild(popupContent);
 
-    let i = 0;
-    let nbpoints = 0;
-    // while(i<points.length){
-    // 	objctx.lineTo(Math.round(Math.abs(points[i])/100000),Math.round(Math.abs(points[i+1])/100000));
-    // 	i=i+2;
-    // 	nbpoints=nbpoints+1;
-
-    // }
-    objctx.closePath();
-    objctx.fillStyle = "#ece8ae";
-    objctx.fill();
-    // dataDiv.appendChild(canvas);
-
-    document.getElementById("selected").appendChild(dataDiv);
+    // Hiển thị popup
+    popup.style.display = "block";
+    popup.style.left = e.pixel[0] + "px";
+    popup.style.top = e.pixel[1] + "px";
 
     return true;
   });
@@ -661,12 +560,22 @@ map.on("click", function (e) {
   } else {
     status.innerHTML = "&nbsp;";
   }
-  // display info wrapper
-  if (document.getElementById("selected").hasChildNodes()) {
-    document.getElementById("selected").style.display = "block";
-  }
 
+  // Hiển thị hoặc ẩn popup
+  if (selected) {
+    popup.style.display = "block";
+  } else {
+    popup.style.display = "none";
+  }
 });
+
+// Ẩn popup khi bấm chuột ngoài popup
+document.addEventListener("click", function (e) {
+  if (!!popup.contains(e.target)) {
+    popup.style.display = "none";
+  }
+});
+
 
 // Draw point, linestring, polygon, circle
 
@@ -683,6 +592,7 @@ function addInteraction() {
     map.addInteraction(draw);
   }
 }
+
 
 /**
  * Handle change event.
@@ -836,11 +746,6 @@ const formatArea = function (polygon) {
   return output;
 };
 
-// const raster = new TileLayer({
-//   source: new OSM(),
-// });
-
-// const source = new VectorSource();
 
 const modify = new Modify({ source: source__, style: modifyStyle });
 

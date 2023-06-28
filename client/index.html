@@ -21,8 +21,8 @@
         <select id="mode" class="form-control">
           <option value="none">Chọn chức năng bản đồ</option>
           <option value="modify">Chọn một tính năng để sửa đổi</option>
-          <option value="draw">Vẽ một tính năng mới</option>
-          <option value="measure">Đo lường các tính năng mới</option>
+          <!-- <option value="draw">Vẽ một tính năng mới</option> -->
+          <!-- <option value="measure">Đo lường các tính năng mới</option> -->
         </select>
 
         <!-- Button save after Modifying -->
@@ -69,10 +69,19 @@
         <div id="options"></div>
       </div>
       <div id="map"></div>  
+       <!-- Popup container -->
+    <div id="popup" class="popup">
+      <div class="popup-title">Thông tin tính năng</div>
+      <div id="popup-content" class="popup-content">
+        <!-- Nội dung của popup -->
+      </div>
+    </div>
     </div>
     <span id="status">&nbsp;</span>
+
+   
+</div>
     
     <script src="https://cdn.jsdelivr.net/npm/elm-pep@1.0.6/dist/elm-pep.js"></script>
-    <!-- <script type="module" src="index.js"></script> -->
   </body>
 </html>
