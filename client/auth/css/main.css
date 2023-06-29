@@ -161,11 +161,29 @@ iframe {
 .limiter {
   width: 100%;
   margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f0efef;
+}
+
+.container {
+  width: 50%;
+  display: flex;
+}
+
+.img-title {
+  flex: 1;
+  background-image: url('../images/bg-01.png');
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0.7;
 }
 
 .container-login100 {
-  width: 100%;  
-  min-height: 100vh;
+  width: 50%;  
   display: -webkit-box;
   display: -webkit-flex;
   display: -moz-box;
@@ -174,7 +192,6 @@ iframe {
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  padding: 15px;
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
@@ -183,10 +200,8 @@ iframe {
 .wrap-login100 {
   width: 500px;
   background: #fff;
-  border-radius: 10px;
   overflow: hidden;
 }
-
 
 /*------------------------------------------------------------------
 [ Form ]*/
