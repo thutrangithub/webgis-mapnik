@@ -71,21 +71,19 @@ const layers = [
     title: "Bản đồ Việt Nam",
     shown: true,
     layer: new VectorTileLayer({
-      // background: 'grey',
-      // declutter: true,
       source: source,
       style: country,
     }),
+    icon: "https://img.icons8.com/bubbles/50/vietnam--v1.png"
   },
   {
     title: "Mong Duong",
     shown: true,
     layer: new VectorTileLayer({
-      // background: 'grey',
-      // declutter: true,
       source: source_,
       style: country,
     }),
+    icon: "https://img.icons8.com/office/50/mine-cart.png"
   },
   {
     title: "Tọa độ z:x:y",
@@ -93,11 +91,13 @@ const layers = [
     layer: new TileLayer({
       source: new TileDebug(),
     }),
+    icon: "https://img.icons8.com/officel/50/grid.png"
   },
   {
     title: "Nền",
     shown: true,
     layer: vector,
+    icon: "https://img.icons8.com/external-flat-design-circle/50/external-background-camping-flat-design-circle.png" 
   },
 ];
 
@@ -113,16 +113,14 @@ const map = new Map({
 
 // Checkbox
 const options = document.getElementById("options");
+
 layers.forEach((l) => {
   // Create a div wrapper
   const divWrapper = document.createElement("div");
+  divWrapper.classList.add("wrapper-class");
 
-  // Add class to the div wrapper
-  divWrapper.classList.add("wrapper-class"); 
-
-  // Create the label element
-  const label = document.createElement("label");
-  divWrapper.appendChild(label);
+  const checkboxTitleWrapper = document.createElement("div");
+  checkboxTitleWrapper.classList.add("checkbox-title-wrapper-class");
 
   // Create the input element
   const inp = document.createElement("input");
@@ -131,9 +129,30 @@ layers.forEach((l) => {
 
   // Apply spacing using CSS
   inp.style.marginRight = "5px";
-  label.appendChild(inp);
 
-  label.appendChild(document.createTextNode(l.title));
+  // Create the title element
+  const title = document.createElement("span");
+  title.textContent = l.title;
+
+  // Add the input and title elements to the checkbox and title wrapper div
+  checkboxTitleWrapper.appendChild(inp);
+  checkboxTitleWrapper.appendChild(title);
+
+  // Create the icon wrapper div
+  const iconWrapper = document.createElement("div");
+  iconWrapper.classList.add("icon-wrapper-class");
+
+  // Create the icon element
+  const icon = document.createElement("i");
+  icon.classList.add("icon-class");
+  icon.innerHTML = '<img src="' + l.icon + '" alt="Icon" />';
+
+  // Add the icon element to the icon wrapper div
+  iconWrapper.appendChild(icon);
+
+  // Add the label to the div wrapper
+  divWrapper.appendChild(checkboxTitleWrapper);
+  divWrapper.appendChild(iconWrapper);
 
   // Add the div wrapper to the options element
   options.appendChild(divWrapper);
@@ -146,6 +165,8 @@ layers.forEach((l) => {
     else map.removeLayer(l.layer);
   });
 });
+
+
 
 
 // handle the choice of action
@@ -441,10 +462,10 @@ saveButton.addEventListener("click", () => {
 });
 
 const mode = document.getElementById("mode");
+
 function onChange() {
   removeInteractions();
   const modeValue = mode.value;
-  // const saveButton = document.getElementById('save-button');
   const draggedFeatureSection = document.getElementById(
     "dragged-feature-section"
   );
@@ -462,13 +483,13 @@ function onChange() {
       measureFeatureSection.style.display = "none"; // Hide measure-feature-section
       break;
     }
-    case "draw": {
-      // saveButton.style.display = 'none';
-      draggedFeatureSection.style.display = "none";
-      drawFeatureSection.style.display = "block"; // Show draw-feature-section
-      measureFeatureSection.style.display = "none"; // Hide measure-feature-section
-      break;
-    }
+    // case "draw": {
+    //   // saveButton.style.display = 'none';
+    //   draggedFeatureSection.style.display = "none";
+    //   drawFeatureSection.style.display = "block"; // Show draw-feature-section
+    //   measureFeatureSection.style.display = "none"; // Hide measure-feature-section
+    //   break;
+    // }
     case "modify": {
       // saveButton.style.display = 'block';
       draggedFeatureSection.style.display = "block";
@@ -514,7 +535,7 @@ map.on("click", function (e) {
   }
   map.forEachFeatureAtPixel(e.pixel, function (f) {
     selected = f;
-    // Tạo nội dung cho popup
+    // Tạo nội dung cho popup 
     let popupContent = document.createElement("div");
     
     let properties = f.getProperties();
@@ -799,21 +820,6 @@ function styleFunction(feature, segments, drawType, tip) {
   return styles;
 }
 
-// const vector = new VectorLayer({
-//   source: source,
-//   style: function (feature) {
-//     return styleFunction(feature, showSegments.checked);
-//   },
-// });
-
-// const map = new Map({
-//   layers: [raster, vector],
-//   target: 'map',
-//   view: new View({
-//     center: [-11000000, 4600000],
-//     zoom: 15,
-//   }),
-// });
 
 map.addInteraction(modify);
 
@@ -865,3 +871,16 @@ showSegments.onchange = function () {
   vector.changed();
   drawMeasure.getOverlay().changed();
 };
+
+
+// Lấy danh sách các phần tử <li>
+const listItems = document.querySelectorAll('#myList li');
+
+// Lặp qua từng phần tử <li> và gắn sự kiện click
+listItems.forEach(function(item) {
+  item.addEventListener('click', function() {
+    // Lấy giá trị của phần tử <li> được nhấp vào
+    const value = this.textContent;
+    console.log(value); // In giá trị ra console
+  });
+});
