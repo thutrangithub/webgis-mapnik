@@ -1,91 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap" rel="stylesheet">
-  </head>
-  <body>
-    <div class="image-container">
-      <div class="image-overlay"></div>
-      <div class="image-title">
-        <p>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <div class="image-container">
+    <div class="image-overlay"></div>
+    <div class="image-title">
+      <p>
         Ban do than da Mong Duong
       </p>
     </div>
-    </div>
+  </div>
 
-    <div id="content">
-      <div id="menu" class="p-4">
-        <div class="img-menu-class">
-          <img width="60" height="60" src="https://img.icons8.com/external-microdots-premium-microdot-graphic/60/external-choose-file-document-microdots-premium-microdot-graphic.png" alt="external-choose-file-document-microdots-premium-microdot-graphic"/>
+  <div id="content">
+    <div id="menu" class="p-4">
+      <div class="img-menu-class">
+        <img width="60" height="60"
+          src="https://img.icons8.com/external-microdots-premium-microdot-graphic/60/external-choose-file-document-microdots-premium-microdot-graphic.png"
+          alt="external-choose-file-document-microdots-premium-microdot-graphic" />
+      </div>
+      <div id="options"></div>
+      <!-- Select mode -->
+      <select id="mode" class="select-control">
+        <option value="none">Chi tiết</option>
+        <option value="modify"> Kéo thả </option>
+        <option value="measure">Đo lường </option>
+        <!-- <option value="draw">Vẽ một tính năng mới</option> -->
+      </select>
+
+      <!-- Button save after Modifying -->
+      <div id="dragged-feature-section" class="form-group" style="display: none;">
+        <label for="dragged-feature-count">Số tính năng đã được kéo:</label>
+        <span id="dragged-feature-count">0</span>
+        <br>
+        <span id="dragged-ids"></span>
+        <button id="save-button">Lưu thông tin</button>
+      </div>
+      <div id="selected" class="form-group p-4" style="display: none;"></div>
+      <div id="commit"></div>
+
+      <!-- Draw new feature -->
+      <form>
+        <div id="draw-feature-section" class="form-group p-4" style="display: none;">
+          <label for="type" class="mb-4">Vẽ một tính năng mới &nbsp;</label>
+          <select id="type" class="form-control mb-4 mt-4">
+            <option value="None">Không</option>
+            <option value="Point">Điểm</option>
+            <option value="LineString">Đường</option>
+            <option value="Polygon">Đa giác</option>
+            <option value="Circle">Hình tròn</option>
+          </select>
+          <button class="btn btn-primary f-right" id="undo">Quay lại</button>
         </div>
-        <div id="options"></div>
-        <!-- Select mode -->
-        <select id="mode" class="select-control">
-            <option value="none">Chi tiết</option>
-            <option value="modify"> Kéo thả </option>
-            <option value="measure">Đo lường </option>
-            <!-- <option value="draw">Vẽ một tính năng mới</option> -->
-        </select>
-
-        <!-- Button save after Modifying -->
-        <div id="dragged-feature-section" class="form-group" style="display: none;">
-          <label for="dragged-feature-count">Số tính năng đã được kéo:</label>
-          <span id="dragged-feature-count">0</span>
-          <br>
-          <span id="dragged-ids"></span>
-          <button id="save-button">Lưu thông tin</button>
-        </div>
-        <div id="selected" class="form-group p-4"  style="display: none;"></div>
-        <div id="commit"></div>
-
-        <!-- Draw new feature -->
-        <form>
-          <div id="draw-feature-section" class="form-group p-4" style="display: none;">
-            <label for="type" class="mb-4">Vẽ một tính năng mới &nbsp;</label>
-              <select id="type" class="form-control mb-4 mt-4">
-                <option value="None">Không</option>
-                <option value="Point">Điểm</option>
-                <option value="LineString">Đường</option>
-                <option value="Polygon">Đa giác</option>
-                <option value="Circle">Hình tròn</option>
-              </select>
-              <button class="btn btn-primary f-right" id="undo">Quay lại</button>
-          </div>
 
         <!-- Measurement -->
-          <div id="measure-feature-section" class="form-group p-4" style="display: none;">
-            <label for="typeMeasure">Loại đo lường &nbsp;</label>
-            <select id="typeMeasure" class="form-control mt-4 mb-4">
-              <option value="None-Measure">Không</option>
-              <option value="LineString">Độ dài (Đường)</option>
-              <option value="Polygon">Vùng (Đa giác)</option>
-            </select>
-            </br>
-            <label for="segments" class="mb-4">Hiển thị độ dài đoạn: &nbsp;</label>
-            <input type="checkbox" id="segments" checked />
-            </br>
-            <label for="clear" class="mb-4">Xóa số đo trước đó: &nbsp;</label>
-            <input type="checkbox" id="clear" checked />
-          </div>
-        </form>
-      </div>
-      <div id="map"></div>  
-       <!-- Popup container -->
+        <div id="measure-feature-section" class="form-group p-4" style="display: none;">
+          <label for="typeMeasure">Loại đo lường &nbsp;</label>
+          <select id="typeMeasure" class="form-control mt-4 mb-4">
+            <option value="None-Measure">Không</option>
+            <option value="LineString">Độ dài (Đường)</option>
+            <option value="Polygon">Vùng (Đa giác)</option>
+          </select>
+          </br>
+          <label for="segments" class="mb-4">Hiển thị độ dài đoạn: &nbsp;</label>
+          <input type="checkbox" id="segments" checked />
+          </br>
+          <label for="clear" class="mb-4">Xóa số đo trước đó: &nbsp;</label>
+          <input type="checkbox" id="clear" checked />
+        </div>
+      </form>
+    </div>
+    <div id="map"></div>
+    <!-- Popup container -->
     <div id="popup" class="popup">
       <div class="popup-title">Thông tin tính năng</div>
       <div id="popup-content" class="popup-content">
         <!-- Nội dung của popup -->
       </div>
     </div>
-    </div>
-    <span id="status">&nbsp;</span>
-</div>
-  
-  </body>
+  </div>
+  <span id="status">&nbsp;</span>
+  </div>
+
+</body>
+
 </html>
