@@ -2,13 +2,14 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
   mode: "development",
-  entry: "./client/index.js",
+  entry: "./client/map.js",
   output: {
-    filename: "bundle.js",
+    filename: "map-bundle.js",
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: "./client/index.html",
+      template: "./client/map.html",
+      filename: "map.html"
     }),
   ],
   devServer: {

@@ -19,7 +19,6 @@ import Style from "ol/style/Style.js";
 import "ol/layer/Vector.js";
 import {
   Modify,
-  Select,
   defaults as defaultInteractions,
 } from "ol/interaction.js";
 import { Pointer as PointerInteraction } from "ol/interaction.js";
@@ -29,6 +28,7 @@ import { Point, Polygon } from "ol/geom";
 import Draw from "ol/interaction/Draw.js";
 import { getArea, getLength } from "ol/sphere.js";
 import RenderFeature from "ol/render/Feature";
+import { deleteLayer, drawFeature, drawLine } from "./function";
 
 // ********************************** Start coding ********************************** //
 // style definition
@@ -170,11 +170,11 @@ layers.forEach((l) => {
 
 
 // handle the choice of action
-const typeSelect = document.getElementById("type");
+// const typeSelect = document.getElementById("type");
 
-const select = new Select();
+// const select = new Select();
 
-const selectedFeatures = select.getFeatures();
+// const selectedFeatures = select.getFeatures();
 
 // Implement the drag interraction
 class Drag extends PointerInteraction {
@@ -225,17 +225,30 @@ var clickPoint;
  */
 function handleDownEvent(evt) {
   clickPoint = JSON.parse(JSON.stringify(evt.coordinate));
-  const map = evt.map;
-  const feature = map.forEachFeatureAtPixel(evt.pixel, function (feature) {
-    return feature;
-  });
+	const map = evt.map;
+  
+	const feature = map.forEachFeatureAtPixel(evt.pixel, function (feature) {
+	  return feature;
+	});
 
-  if (feature) {
-    this.coordinate_ = evt.coordinate;
-    this.feature_ = feature;
-  }
+	if (feature) {
+	  this.coordinate_ = evt.coordinate;
+	  this.feature_ = feature;
 
-  return !!feature;
+	}
+
+	if(this.feature_.type_=="Polygon"){	
+		var FlatCoordinates = this.feature_.getFlatCoordinates();
+		var gid = this.feature_.getProperties().gid;
+
+		drawFeature(map,FlatCoordinates,0,null,new Style({
+			fill: new Fill({ color: '#ece8ae', weight: 4 }),
+			stroke: new Stroke({ color: 'blue', width: 2 })
+		}),gid);
+	}
+  
+	return !!feature;
+
 }
 
 /**
@@ -254,59 +267,22 @@ function handleDragEvent(evt) {
 
   var points = [clickPoint, [this.coordinate_[0], this.coordinate_[1]]];
 
-  // if (map.getAllLayers().length > 2) {
-  //   map.removeLayer(map.getAllLayers()[2])
-  // }
+	deleteLayer(map,'vectorLineLayer');
 
-  map.getLayers().forEach((layer) => {
-    if (layer.getClassName() == "vectorLineLayer") {
-      // console.log("delete layers");
-      map.removeLayer(layer);
-    }
-  });
+  // var featureLine = new Feature({
+  //   geometry: new LineString(points),
+  // });
 
-  var featureLine = new Feature({
-    geometry: new LineString(points),
-  });
+  if(this.feature_.type_=="Polygon"){	
+		var FlatCoordinates = this.feature_.getFlatCoordinates();
+	}
+	else{
+		var FlatCoordinates = this.feature_.values_.geometry.getFlatCoordinates();
+	}
 
-  let FlatCoordinates;
+  drawLine(map,points)
+	drawFeature(map,FlatCoordinates,1,points,null);
 
-  // console.log("this.feature_", this.feature_)
-
-  if (this.feature_.hasOwnProperty("getFlatCoordinates")) {
-    FlatCoordinates = this.feature_.getFlatCoordinates();
-  }
-
-  // var FlatCoordinates = this.feature_.getFlatCoordinates()
-  var coordinates = [[]];
-
-  var i = 0;
-  while (i < FlatCoordinates?.length) {
-    coordinates[0][i / 2] = [FlatCoordinates[i], FlatCoordinates[i + 1]];
-    i = i + 2;
-  }
-
-  var featurePolygon = new Feature({
-    geometry: new Polygon(coordinates),
-  });
-
-  featurePolygon
-    .getGeometry()
-    .translate(points[1][0] - points[0][0], points[1][1] - points[0][1]);
-  var vectorLineSource = new VectorSource({});
-  vectorLineSource.addFeature(featureLine);
-  vectorLineSource.addFeature(featurePolygon);
-
-  var vectorLineLayer = new VectorLayer({
-    className: "vectorLineLayer",
-    source: vectorLineSource,
-    style: new Style({
-      fill: new Fill({ color: "#F6F7F9", weight: 4 }),
-      stroke: new Stroke({ color: "#213660", width: 2 }),
-    }),
-  });
-
-  map.addLayer(vectorLineLayer);
 }
 
 /**
@@ -315,21 +291,23 @@ function handleDragEvent(evt) {
 
 function handleMoveEvent(evt) {
   if (this.cursor_) {
-    const map = evt.map;
-    const feature = map.forEachFeatureAtPixel(evt.pixel, function (feature) {
-      return feature;
-    });
-    const element = evt.map.getTargetElement();
-    if (feature) {
-      if (element.style.cursor != this.cursor_) {
-        this.previousCursor_ = element.style.cursor;
-        element.style.cursor = this.cursor_;
-      }
-    } else if (this.previousCursor_ !== undefined) {
-      element.style.cursor = this.previousCursor_;
-      this.previousCursor_ = undefined;
-    }
-  }
+	  const map = evt.map;
+
+	  const feature = map.forEachFeatureAtPixel(evt.pixel, function (feature) {
+		return feature;
+	  });
+	  const element = evt.map.getTargetElement();
+	  if (feature) {
+		if (element.style.cursor != this.cursor_) {
+		  this.previousCursor_ = element.style.cursor;
+		  element.style.cursor = this.cursor_;
+		}
+	  } else if (this.previousCursor_ !== undefined) {
+		element.style.cursor = this.previousCursor_;
+		this.previousCursor_ = undefined;
+	  }
+	}
+
 }
 
 /**
@@ -338,15 +316,42 @@ function handleMoveEvent(evt) {
 
 function updateDraggedFeatureCount() {
   const countElement = document.getElementById("dragged-feature-count");
-  countElement.textContent = draggedFeatureCount.toString();
+  countElement.textContent = draggedFeatureIds.length;
   document.getElementById("dragged-ids").textContent =
     "Danh sách id tính năng đã được kéo: " + draggedFeatureIds.join(",");
 }
 
 // init variable store polygon
-var FlatCoordinates = [];
+
 
 function handleUpEvent(evt) {
+  deleteLayer(map,'vectorLineLayer');
+
+  let gid = null;
+	let FlatCoordinates = null;
+
+
+  if(this.feature_.type_=="Polygon"){
+		FlatCoordinates = this.feature_.getFlatCoordinates();
+		gid = this.feature_.getProperties().gid;
+
+	}
+	else{
+		FlatCoordinates = this.feature_.values_.geometry.getFlatCoordinates();
+		gid = this.feature_.id_;
+
+	}
+
+	var points = [clickPoint,[this.coordinate_[0],this.coordinate_[1]] ];
+
+
+
+	drawFeature(map,FlatCoordinates,1,points,new Style({
+				fill: new Fill({ color: '#ece8ae', weight: 4 }),
+				stroke: new Stroke({ color: 'green', width: 2 })
+			}),gid);
+
+
   map.getLayers().forEach((layer) => {
     if (layer.getClassName() == "vectorLineLayer") {
       map.removeLayer(layer);
@@ -402,7 +407,6 @@ function handleUpEvent(evt) {
   //add the layers
   if (this.feature_ instanceof Feature) {
   }
-  const gid = this.feature_.getProperties().gid;
   map.addLayer(vectorCommitLayer);
   map.addLayer(vectorNewCommitLayer);
 
@@ -410,12 +414,6 @@ function handleUpEvent(evt) {
     draggedFeatureIds.push(gid);
   }
   if (deltaXTotal != 0 || deltaYTotal != 0) {
-    // Thêm ID của feature vào mảng draggedFeatureIds
-    // const featureId = this.feature_.getProperties().gid || this.feature_.ol_uid;
-    // if (gid) {
-    //   draggedFeatureIds.push(gid);
-    // }
-    // Tăng giá trị draggedFeatureCount lên 1
     draggedFeatureCount += 1;
     updateDraggedFeatureCount();
   }
@@ -430,7 +428,7 @@ function handleUpEvent(evt) {
 
 const drag = new Drag();
 
-let modifications = [];
+// let modifications = [];
 
 function removeInteractions() {
   map.removeInteraction(drag);

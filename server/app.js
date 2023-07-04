@@ -6,17 +6,23 @@ const { callLayer } = require("./components/connectDb");
 const connectDb = require("./components/connectDb");
 const cors = require('cors');
 const app = express();
+
 app.use(cors({
   origin: '*'
 }));
-// app.use('/', express.static(path.join(__dirname, '../dist')));
+
+app.use('/', express.static(path.join(__dirname, '../dist')));
+app.use('/', express.static(path.join(__dirname, '../client')));
+
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, '../views'));
+
+
 app.get("/api/vector/:layerId/:z/:x/:y", async (req, res) => {
   try {
     const map = new MapPackage();
     const db = new connectDb();
     const xml = await db.callLayer(req.params.layerId);
-    // console.log(xml)
-    // const content = await fs.readFile(`${__dirname}/data/stylesheetG3.xml`, 'utf8')
     await map.LoadMapFromString(xml);
     const buffer = await map.RenderVectorTile(
       +req.params.x,
@@ -28,7 +34,24 @@ app.get("/api/vector/:layerId/:z/:x/:y", async (req, res) => {
   } catch (err) {
     res.send(err?.stack);
   }
+}); 
+
+// Đường dẫn tới thư mục chứa các tệp tĩnh (như HTML, CSS, JS)
+const publicDir = path.join(__dirname, '../client');
+
+// Đặt đường dẫn mặc định cho trang login
+app.get('/', (req, res) => {
+  console.log(1211)
+  res.render('login');
 });
+
+
+// Xử lý đường dẫn /dashboard
+app.get('/map', (req, res) => {
+  res.sendFile(path.join(__dirname, '../dist/map.html'));
+});
+
+// Start server tại cổng 8000
 app.listen(8000, () => {
-  console.log("App is running...");
+  console.log('Server is running at http://localhost:8000');
 });
