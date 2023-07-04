@@ -41,7 +41,6 @@ const publicDir = path.join(__dirname, '../client');
 
 // Đặt đường dẫn mặc định cho trang login
 app.get('/', (req, res) => {
-  console.log(1211)
   res.render('login');
 });
 
