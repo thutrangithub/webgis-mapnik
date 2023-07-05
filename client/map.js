@@ -29,7 +29,6 @@ import Draw from "ol/interaction/Draw.js";
 import { getArea, getLength } from "ol/sphere.js";
 import RenderFeature from "ol/render/Feature";
 import { deleteLayer, drawFeature, drawLine } from "./function";
-
 // ********************************** Start coding ********************************** //
 // style definition
 const country = new Style({
@@ -97,7 +96,7 @@ const layers = [
     title: "Nền",
     shown: true,
     layer: vector,
-    icon: "https://img.icons8.com/external-flat-design-circle/50/external-background-camping-flat-design-circle.png" 
+    icon: "https://img.icons8.com/external-flat-design-circle/50/external-background-camping-flat-design-circle.png"
   },
 ];
 
@@ -107,7 +106,7 @@ const map = new Map({
   layers: layers.filter((e) => e.shown).map((e) => e.layer),
   view: new View({
     center: [0, 0],
-    zoom: 2,
+    zoom: 4,
   }),
 });
 
@@ -155,7 +154,7 @@ layers.forEach((l) => {
   divWrapper.appendChild(iconWrapper);
 
   // Add the div wrapper to the options element
-  options.appendChild(divWrapper);
+  options?.appendChild(divWrapper);
 
   // Add click event listener to the input element
   inp.addEventListener("click", () => {
@@ -225,29 +224,29 @@ var clickPoint;
  */
 function handleDownEvent(evt) {
   clickPoint = JSON.parse(JSON.stringify(evt.coordinate));
-	const map = evt.map;
-  
-	const feature = map.forEachFeatureAtPixel(evt.pixel, function (feature) {
-	  return feature;
-	});
+  const map = evt.map;
 
-	if (feature) {
-	  this.coordinate_ = evt.coordinate;
-	  this.feature_ = feature;
+  const feature = map.forEachFeatureAtPixel(evt.pixel, function (feature) {
+    return feature;
+  });
 
-	}
+  if (feature) {
+    this.coordinate_ = evt.coordinate;
+    this.feature_ = feature;
 
-	if(this.feature_.type_=="Polygon"){	
-		var FlatCoordinates = this.feature_.getFlatCoordinates();
-		var gid = this.feature_.getProperties().gid;
+  }
 
-		drawFeature(map,FlatCoordinates,0,null,new Style({
-			fill: new Fill({ color: '#ece8ae', weight: 4 }),
-			stroke: new Stroke({ color: 'blue', width: 2 })
-		}),gid);
-	}
-  
-	return !!feature;
+  if (this.feature_.type_ == "Polygon") {
+    var FlatCoordinates = this.feature_.getFlatCoordinates();
+    var gid = this.feature_.getProperties().gid;
+
+    drawFeature(map, FlatCoordinates, 0, null, new Style({
+      fill: new Fill({ color: '#ece8ae', weight: 4 }),
+      stroke: new Stroke({ color: 'blue', width: 2 })
+    }), gid);
+  }
+
+  return !!feature;
 
 }
 
@@ -267,21 +266,21 @@ function handleDragEvent(evt) {
 
   var points = [clickPoint, [this.coordinate_[0], this.coordinate_[1]]];
 
-	deleteLayer(map,'vectorLineLayer');
+  deleteLayer(map, 'vectorLineLayer');
 
   // var featureLine = new Feature({
   //   geometry: new LineString(points),
   // });
 
-  if(this.feature_.type_=="Polygon"){	
-		var FlatCoordinates = this.feature_.getFlatCoordinates();
-	}
-	else{
-		var FlatCoordinates = this.feature_.values_.geometry.getFlatCoordinates();
-	}
+  if (this.feature_.type_ == "Polygon") {
+    var FlatCoordinates = this.feature_.getFlatCoordinates();
+  }
+  else {
+    var FlatCoordinates = this.feature_.values_.geometry.getFlatCoordinates();
+  }
 
-  drawLine(map,points)
-	drawFeature(map,FlatCoordinates,1,points,null);
+  drawLine(map, points)
+  drawFeature(map, FlatCoordinates, 1, points, null);
 
 }
 
@@ -291,22 +290,22 @@ function handleDragEvent(evt) {
 
 function handleMoveEvent(evt) {
   if (this.cursor_) {
-	  const map = evt.map;
+    const map = evt.map;
 
-	  const feature = map.forEachFeatureAtPixel(evt.pixel, function (feature) {
-		return feature;
-	  });
-	  const element = evt.map.getTargetElement();
-	  if (feature) {
-		if (element.style.cursor != this.cursor_) {
-		  this.previousCursor_ = element.style.cursor;
-		  element.style.cursor = this.cursor_;
-		}
-	  } else if (this.previousCursor_ !== undefined) {
-		element.style.cursor = this.previousCursor_;
-		this.previousCursor_ = undefined;
-	  }
-	}
+    const feature = map.forEachFeatureAtPixel(evt.pixel, function (feature) {
+      return feature;
+    });
+    const element = evt.map.getTargetElement();
+    if (feature) {
+      if (element.style.cursor != this.cursor_) {
+        this.previousCursor_ = element.style.cursor;
+        element.style.cursor = this.cursor_;
+      }
+    } else if (this.previousCursor_ !== undefined) {
+      element.style.cursor = this.previousCursor_;
+      this.previousCursor_ = undefined;
+    }
+  }
 
 }
 
@@ -325,31 +324,31 @@ function updateDraggedFeatureCount() {
 
 
 function handleUpEvent(evt) {
-  deleteLayer(map,'vectorLineLayer');
+  deleteLayer(map, 'vectorLineLayer');
 
   let gid = null;
-	let FlatCoordinates = null;
+  let FlatCoordinates = null;
 
 
-  if(this.feature_.type_=="Polygon"){
-		FlatCoordinates = this.feature_.getFlatCoordinates();
-		gid = this.feature_.getProperties().gid;
+  if (this.feature_.type_ == "Polygon") {
+    FlatCoordinates = this.feature_.getFlatCoordinates();
+    gid = this.feature_.getProperties().gid;
 
-	}
-	else{
-		FlatCoordinates = this.feature_.values_.geometry.getFlatCoordinates();
-		gid = this.feature_.id_;
+  }
+  else {
+    FlatCoordinates = this.feature_.values_.geometry.getFlatCoordinates();
+    gid = this.feature_.id_;
 
-	}
+  }
 
-	var points = [clickPoint,[this.coordinate_[0],this.coordinate_[1]] ];
+  var points = [clickPoint, [this.coordinate_[0], this.coordinate_[1]]];
 
 
 
-	drawFeature(map,FlatCoordinates,1,points,new Style({
-				fill: new Fill({ color: '#ece8ae', weight: 4 }),
-				stroke: new Stroke({ color: 'green', width: 2 })
-			}),gid);
+  drawFeature(map, FlatCoordinates, 1, points, new Style({
+    fill: new Fill({ color: '#ece8ae', weight: 4 }),
+    stroke: new Stroke({ color: 'green', width: 2 })
+  }), gid);
 
 
   map.getLayers().forEach((layer) => {
@@ -435,7 +434,7 @@ function removeInteractions() {
 }
 
 const saveButton = document.getElementById("save-button");
-saveButton.addEventListener("click", () => {
+saveButton?.addEventListener("click", () => {
   const requestOptions = {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -461,7 +460,8 @@ saveButton.addEventListener("click", () => {
 
 const mode = document.getElementById("mode");
 
-function onChange() {
+
+mode?.addEventListener("change", function (e) {
   removeInteractions();
   const modeValue = mode.value;
   const draggedFeatureSection = document.getElementById(
@@ -504,6 +504,13 @@ function onChange() {
       map.addInteraction(drag);
       break;
     }
+    case "new": {
+      // saveButton.style.display = 'block';
+      draggedFeatureSection.style.display = "none";
+      drawFeatureSection.style.display = "none"; // Hide draw-feature-section
+      measureFeatureSection.style.display = "none"; // Hide measure-feature-section
+      break;
+    }
     default: {
       // saveButton.style.display = 'none';
       draggedFeatureSection.style.display = "none";
@@ -511,17 +518,19 @@ function onChange() {
       measureFeatureSection.style.display = "none"; // Hide measure-feature-section
     }
   }
-}
-mode.addEventListener("change", onChange);
-onChange();
+});
 
 // display data of the clicked vector
 const status = document.getElementById("status");
 const popup = document.getElementById("popup");
 
+const handleNewFeature = (e) => {
+  e.preventDefault();
+  alert('Thêm địa điểm mới thành công.')
+  // call api
+}
 let selected = null;
-
-map.on("click", function (e) {
+map.on("singleclick", function (e) {
   while (document.getElementById("selected").firstChild) {
     document
       .getElementById("selected")
@@ -531,38 +540,134 @@ map.on("click", function (e) {
   if (selected !== null) {
     selected = null;
   }
+
+  const feature = map.getFeaturesAtPixel(e.pixel)[0];
+  if (!feature) {
+    return;
+  }
+
+  let point = map.getCoordinateFromPixel(e.pixel);
+  if (mode.value === "new" && point) {
+    let popupContent = document.createElement("div");
+
+    let divWrapper = document.createElement("div");
+    divWrapper.classList.add('content-popup-class');
+
+    let inputName = document.createElement("input");
+    inputName.setAttribute('name', 'name');
+    inputName.setAttribute('type', 'text');
+    inputName.classList.add('form-control');
+    inputName.setAttribute('placeholder', 'Nhập tên');
+
+    let inputLongtidute = document.createElement("input");
+    inputLongtidute.classList.add('form-control');
+    inputLongtidute.setAttribute('name', 'long');
+    inputLongtidute.setAttribute('type', 'text');
+    inputLongtidute.setAttribute('readonly', true);
+    inputLongtidute.setAttribute('value', point[0]);
+
+    let inputLattidute = document.createElement("input");
+    inputLattidute.classList.add('form-control');
+    inputLattidute.setAttribute('name', 'long');
+    inputLattidute.setAttribute('type', 'text');
+    inputLattidute.setAttribute('readonly', true);
+    inputLattidute.setAttribute('value', point[1]);
+
+    let formAction = document.createElement('div');
+    formAction.classList.add('form-action', 'text-center');
+    let buttonSubmit = document.createElement('button');
+    buttonSubmit.setAttribute('type', 'submit');
+    buttonSubmit.classList.add('btn', 'btn-primary');
+    buttonSubmit.textContent = "Tạo";
+    formAction.appendChild(buttonSubmit);
+
+    // new wrapper
+    let formGroup = document.createElement('div');
+    formGroup.classList.add('form-group');
+    let label = document.createElement('label');
+    label.classList.add('label');
+    label.textContent = "Tên địa điểm";
+    formGroup.appendChild(label);
+    formGroup.appendChild(inputName);
+    divWrapper.appendChild(formGroup);
+
+    formGroup = document.createElement('div');
+    formGroup.classList.add('form-group');
+    label = document.createElement('label');
+    label.classList.add('label');
+    label.textContent = "Longtidute";
+    formGroup.appendChild(label);
+    formGroup.appendChild(inputLongtidute);
+    divWrapper.appendChild(formGroup);
+
+    formGroup = document.createElement('div');
+    formGroup.classList.add('form-group');
+    label = document.createElement('label');
+    label.classList.add('label');
+    label.textContent = "Lattidute";
+    formGroup.appendChild(label);
+    formGroup.appendChild(inputLattidute);
+    divWrapper.appendChild(formGroup);
+
+    divWrapper.appendChild(formAction);
+
+    let form = document.createElement('form');
+    form.setAttribute('id', 'form-new-feature');
+    form.setAttribute('method', 'post');
+    form.setAttribute('action', '/new-feature');
+    form.appendChild(divWrapper);
+
+    form.addEventListener('submit', (e) => {
+      handleNewFeature(e);
+    })
+
+    popupContent.appendChild(form);
+
+    // Đặt nội dung cho popup
+    popup.querySelector('.popup-title').textContent = "Thêm địa điểm mới";
+    document.getElementById("popup-content").innerHTML = "";
+    document.getElementById("popup-content").appendChild(popupContent);
+
+    // Hiển thị popup
+    popup.style.display = "block";
+    popup.style.left = e.pixel[0] + "px";
+    popup.style.top = e.pixel[1] + "px";
+    return;
+  }
   map.forEachFeatureAtPixel(e.pixel, function (f) {
     selected = f;
     // Tạo nội dung cho popup 
     let popupContent = document.createElement("div");
-    
+
     let properties = f.getProperties();
+
     let data = [
       { label: "Quốc gia:", value: properties.COUNTRY },
       { label: "Khu vực:", value: properties.ENGTYPE_1 },
       { label: "Vùng:", value: properties.NAME_1 },
     ];
-    
+
     for (let i = 0; i < data.length; i++) {
       let paragraph = document.createElement("p");
       paragraph.classList.add("content-popup-class");
-    
+
       let labelSpan = document.createElement("span");
       labelSpan.classList.add("label-popup-class");
       labelSpan.appendChild(document.createTextNode(data[i].label));
-    
+
       let valueSpan = document.createElement("span");
       valueSpan.classList.add("value-popup-class");
       valueSpan.appendChild(document.createTextNode(" " + data[i].value));
-    
+
       paragraph.appendChild(labelSpan);
       paragraph.appendChild(valueSpan);
-    
+
       popupContent.appendChild(paragraph);
     }
-    
+
 
     // Đặt nội dung cho popup
+    popup.querySelector('.popup-title').textContent = "Thông tin tính năng";
     document.getElementById("popup-content").innerHTML = "";
     document.getElementById("popup-content").appendChild(popupContent);
 
@@ -602,8 +707,8 @@ const typeSelection = document.getElementById("type");
 
 let draw; // global so we can remove it later
 function addInteraction() {
-  const value = typeSelection.value;
-  if (value !== "None") {
+  const value = typeSelection?.value;
+  if (value && value !== "None") {
     draw = new Draw({
       source: source__,
       type: typeSelection.value,
@@ -616,12 +721,12 @@ function addInteraction() {
 /**
  * Handle change event.
  */
-typeSelection.onchange = function () {
+typeSelection?.addEventListener('change', function (e) {
   map.removeInteraction(draw);
   addInteraction();
-};
+});
 
-document.getElementById("undo").addEventListener("click", function () {
+document.getElementById("undo")?.addEventListener("click", function () {
   draw.removeLastPoint();
 });
 
@@ -824,8 +929,8 @@ map.addInteraction(modify);
 let drawMeasure; // global so we can remove it later
 
 function addMeasureInteraction() {
-  const drawType = typeSelectMeasure.value;
-  if (drawType !== "None-Measure") {
+  const drawType = typeSelectMeasure?.value;
+  if (drawType && drawType !== "None-Measure") {
     const activeTip =
       "Click to continue drawing the " +
       (drawType === "Polygon" ? "polygon" : "line");
@@ -858,25 +963,25 @@ function addMeasureInteraction() {
   }
 }
 
-typeSelectMeasure.onchange = function () {
+typeSelectMeasure?.addEventListener('change', function (e) {
   map.removeInteraction(drawMeasure);
   addMeasureInteraction();
-};
+});
 
 addMeasureInteraction();
 
-showSegments.onchange = function () {
+showSegments?.addEventListener('change', function (e) {
   vector.changed();
   drawMeasure.getOverlay().changed();
-};
+});
 
 
 // Lấy danh sách các phần tử <li>
 const listItems = document.querySelectorAll('#myList li');
 
 // Lặp qua từng phần tử <li> và gắn sự kiện click
-listItems.forEach(function(item) {
-  item.addEventListener('click', function() {
+listItems.forEach(function (item) {
+  item.addEventListener('click', function () {
     // Lấy giá trị của phần tử <li> được nhấp vào
     const value = this.textContent;
     console.log(value); // In giá trị ra console

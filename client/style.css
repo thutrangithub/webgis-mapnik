@@ -298,3 +298,16 @@ label[for] {
     color: red;
     font-weight: 500;
 }
+.text-center{
+    text-align: center;
+}
+.form-group{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.form-control{
+    padding: 0.5rem;
+    border-radius: 0.2rem;
+    margin-bottom: 0.2rem;
+}

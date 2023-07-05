@@ -34,7 +34,7 @@ app.get("/api/vector/:layerId/:z/:x/:y", async (req, res) => {
   } catch (err) {
     res.send(err?.stack);
   }
-}); 
+});
 
 // Đường dẫn tới thư mục chứa các tệp tĩnh (như HTML, CSS, JS)
 const publicDir = path.join(__dirname, '../client');
@@ -50,7 +50,8 @@ app.get('/map', (req, res) => {
   res.sendFile(path.join(__dirname, '../dist/map.html'));
 });
 
-// Start server tại cổng 8000
-app.listen(8000, () => {
-  console.log('Server is running at http://localhost:8000');
+const port = 3000;
+// Start server tại cổng ${port}
+app.listen(port, () => {
+  console.log('Server is running at http://localhost:' + port);
 });
