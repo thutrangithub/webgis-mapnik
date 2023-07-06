@@ -632,6 +632,7 @@ map.on("singleclick", function (e) {
     popup.style.display = "block";
     popup.style.left = e.pixel[0] + "px";
     popup.style.top = e.pixel[1] + "px";
+    handleHidePopup();
     return;
   }
   map.forEachFeatureAtPixel(e.pixel, function (f) {
@@ -665,7 +666,6 @@ map.on("singleclick", function (e) {
       popupContent.appendChild(paragraph);
     }
 
-
     // Đặt nội dung cho popup
     popup.querySelector('.popup-title').textContent = "Thông tin tính năng";
     document.getElementById("popup-content").innerHTML = "";
@@ -676,6 +676,7 @@ map.on("singleclick", function (e) {
     popup.style.left = e.pixel[0] + "px";
     popup.style.top = e.pixel[1] + "px";
 
+    handleHidePopup();
     return true;
   });
 
@@ -694,11 +695,14 @@ map.on("singleclick", function (e) {
 });
 
 // Ẩn popup khi bấm chuột ngoài popup
-document.addEventListener("click", function (e) {
-  if (!!popup.contains(e.target)) {
-    popup.style.display = "none";
-  }
-});
+const handleHidePopup = () => {
+  document.addEventListener("click", function (e) {
+    let _popup = document.getElementById("popup");
+    if (!_popup.contains(e.target)) {
+      _popup.style.display = "none";
+    }
+  })
+}
 
 
 // Draw point, linestring, polygon, circle
