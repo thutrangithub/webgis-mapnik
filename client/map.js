@@ -29,6 +29,7 @@ import Draw from "ol/interaction/Draw.js";
 import { getArea, getLength } from "ol/sphere.js";
 import RenderFeature from "ol/render/Feature";
 import { deleteLayer, drawFeature, drawLine } from "./function";
+import OSM from "ol/source/OSM.js";
 // ********************************** Start coding ********************************** //
 // style definition
 const country = new Style({
@@ -66,6 +67,16 @@ const vector = new VectorLayer({
 
 // def the layers to dispaly on the map
 const layers = [
+  {
+    title: "Bản đồ Thế giới",
+    shown: true,
+    layer: new TileLayer({
+      source: new OSM(),
+      label: "OpenStreetMap",
+    }),
+    icon: "https://img.icons8.com/bubbles/50/vietnam--v1.png"
+  },
+
   {
     title: "Bản đồ Việt Nam",
     shown: true,
@@ -159,9 +170,8 @@ layers.forEach((l) => {
   // Add click event listener to the input element
   inp.addEventListener("click", () => {
     l.shown = !l.shown;
-
-    if (l.shown) map.addLayer(l.layer);
-    else map.removeLayer(l.layer);
+    if (l.shown) l.layer.setVisible(true)
+    else l.layer.setVisible(false)
   });
 });
 
