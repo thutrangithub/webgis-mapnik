@@ -30,6 +30,7 @@ import { getArea, getLength } from "ol/sphere.js";
 import RenderFeature from "ol/render/Feature";
 import { deleteLayer, drawFeature, drawLine } from "./function";
 import OSM from "ol/source/OSM.js";
+import jscolor from "./plugins/jscolor.js";
 // ********************************** Start coding ********************************** //
 // style definition
 const country = new Style({
@@ -521,6 +522,13 @@ mode?.addEventListener("change", function (e) {
       measureFeatureSection.style.display = "none"; // Hide measure-feature-section
       break;
     }
+    case "color": {
+      // saveButton.style.display = 'block';
+      draggedFeatureSection.style.display = "none";
+      drawFeatureSection.style.display = "none"; // Hide draw-feature-section
+      measureFeatureSection.style.display = "none"; // Hide measure-feature-section
+      break;
+    }
     default: {
       // saveButton.style.display = 'none';
       draggedFeatureSection.style.display = "none";
@@ -539,6 +547,25 @@ const handleNewFeature = (e) => {
   alert('Thêm địa điểm mới thành công.')
   // call api
 }
+const handleSetColorFeature = (e) => {
+  e.preventDefault();
+  let color = e.target.querySelector('input[name="color"]').value;
+  alert('Màu sắc được chọn :' + color)
+  // call api
+}
+// let's set defaults for all color pickers
+jscolor.presets.default = {
+  width: 141,               // make the picker a little narrower
+  position: 'right',        // position it to the right of the target
+  previewPosition: 'right', // display color preview on the right
+  previewSize: 40,          // make the color preview bigger
+  palette: [
+    '#000000', '#7d7d7d', '#870014', '#ec1c23', '#ff7e26',
+    '#fef100', '#22b14b', '#00a1e7', '#3f47cc', '#a349a4',
+    '#ffffff', '#c3c3c3', '#b87957', '#feaec9', '#ffc80d',
+    '#eee3af', '#b5e61d', '#99d9ea', '#7092be', '#c8bfe7',
+  ],
+};
 let selected = null;
 map.on("singleclick", function (e) {
   while (document.getElementById("selected").firstChild) {
@@ -555,8 +582,8 @@ map.on("singleclick", function (e) {
   if (!feature) {
     return;
   }
-
   let point = map.getCoordinateFromPixel(e.pixel);
+  // new feature
   if (mode.value === "new" && point) {
     let popupContent = document.createElement("div");
 
@@ -645,6 +672,81 @@ map.on("singleclick", function (e) {
     handleHidePopup();
     return;
   }
+  // color feature
+  if (mode.value === "color" && point) {
+    let popupContent = document.createElement("div");
+
+    let divWrapper = document.createElement("div");
+    divWrapper.classList.add('content-popup-class');
+
+    let inputName = document.createElement("input");
+    inputName.setAttribute('name', 'name');
+    inputName.setAttribute('type', 'text');
+    inputName.classList.add('form-control');
+    inputName.setAttribute('readonly', true);
+    inputName.value = feature.properties_.NAME_1;
+
+    let formAction = document.createElement('div');
+    formAction.classList.add('form-action', 'text-center');
+    let buttonSubmit = document.createElement('button');
+    buttonSubmit.setAttribute('type', 'submit');
+    buttonSubmit.classList.add('btn', 'btn-primary');
+    buttonSubmit.textContent = "Lưu";
+    formAction.appendChild(buttonSubmit);
+
+    let colorPicker = document.createElement('input');
+    colorPicker.setAttribute('data-jscolor', '{}');
+    colorPicker.setAttribute('name', 'color');
+    colorPicker.value = "#3399FF80";
+    colorPicker.classList.add('form-control');
+
+    let picker = new JSColor(colorPicker);
+
+    // name wrapper
+    let formGroup = document.createElement('div');
+    formGroup.classList.add('form-group');
+    let label = document.createElement('label');
+    label.classList.add('label');
+    label.textContent = "Tên tỉnh thành";
+    formGroup.appendChild(label);
+    formGroup.appendChild(inputName);
+    divWrapper.appendChild(formGroup);
+    // color picker
+    formGroup = document.createElement('div');
+    formGroup.classList.add('form-group');
+    label = document.createElement('label');
+    label.classList.add('label');
+    label.textContent = "Chọn màu sắc";
+    formGroup.appendChild(label);
+    formGroup.appendChild(colorPicker);
+    divWrapper.appendChild(formGroup);
+
+    divWrapper.appendChild(formAction);
+
+    let form = document.createElement('form');
+    form.setAttribute('id', 'form-set-color-feature');
+    form.setAttribute('method', 'post');
+    form.setAttribute('action', '/set-color-feature');
+    form.appendChild(divWrapper);
+
+    form.addEventListener('submit', (e) => {
+      handleSetColorFeature(e);
+    })
+
+    popupContent.appendChild(form);
+
+    // Đặt nội dung cho popup
+    popup.querySelector('.popup-title').textContent = "Chọn màu sắc cho tỉnh thành";
+    document.getElementById("popup-content").innerHTML = "";
+    document.getElementById("popup-content").appendChild(popupContent);
+
+    // Hiển thị popup
+    popup.style.display = "block";
+    popup.style.left = e.pixel[0] + "px";
+    popup.style.top = e.pixel[1] + "px";
+    handleHidePopup();
+    return;
+  }
   map.forEachFeatureAtPixel(e.pixel, function (f) {
     selected = f;
     // Tạo nội dung cho popup 
@@ -708,7 +810,8 @@ map.on("singleclick", function (e) {
 const handleHidePopup = () => {
   document.addEventListener("click", function (e) {
     let _popup = document.getElementById("popup");
-    if (!_popup.contains(e.target)) {
+    let colorPicker = document.querySelector('.jscolor-picker');
+    if (!_popup.contains(e.target) && !colorPicker?.contains(e.target)) {
       _popup.style.display = "none";
     }
   })
