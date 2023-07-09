@@ -247,7 +247,7 @@ function handleDownEvent(evt) {
 
   }
 
-  if (this.feature_.type_ == "Polygon") {
+  if (this.feature_ && this.feature_.type_ == "Polygon") {
     var FlatCoordinates = this.feature_.getFlatCoordinates();
     var gid = this.feature_.getProperties().gid;
 
@@ -745,6 +745,10 @@ map.on("singleclick", function (e) {
     popup.style.left = e.pixel[0] + "px";
     popup.style.top = e.pixel[1] + "px";
     handleHidePopup();
+    return;
+  }
+  // not modify mode
+  if (mode.value !== "none") {
     return;
   }
   map.forEachFeatureAtPixel(e.pixel, function (f) {
