@@ -11,8 +11,8 @@ const initOptions = {
     }
   },
 };
-const dbHost = "postgres-postgis";
-// const dbHost = "localhost";
+// const dbHost = "postgres-postgis";
+const dbHost = "localhost";
 const pgp = require("pg-promise")(initOptions);
 const db = pgp(`postgresql://postgres:1@${dbHost}:5432/webgis`);
 

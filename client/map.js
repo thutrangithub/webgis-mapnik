@@ -35,7 +35,7 @@ import jscolor from "./plugins/jscolor.js";
 // style definition
 const country = new Style({
   stroke: new Stroke({
-    color: " black ",
+    color: "#ff4200",
     width: 1,
   }),
   fill: new Fill({
@@ -75,7 +75,7 @@ const layers = [
       source: new OSM(),
       label: "OpenStreetMap",
     }),
-    icon: "https://img.icons8.com/bubbles/50/vietnam--v1.png"
+    icon: "https://img.icons8.com/officel/50/world-map.png"
   },
 
   {
@@ -88,7 +88,7 @@ const layers = [
     icon: "https://img.icons8.com/bubbles/50/vietnam--v1.png"
   },
   {
-    title: "Mong Duong",
+    title: "Mông Dương - Quảng Ninh",
     shown: true,
     layer: new VectorTileLayer({
       source: source_,
@@ -758,11 +758,22 @@ map.on("singleclick", function (e) {
 
     let properties = f.getProperties();
 
-    let data = [
-      { label: "Quốc gia:", value: properties.COUNTRY },
-      { label: "Khu vực:", value: properties.ENGTYPE_1 },
-      { label: "Vùng:", value: properties.NAME_1 },
-    ];
+    let data =[]
+    if(properties.hasOwnProperty("properties")){
+      const propertiesObj = JSON.parse(properties.properties);
+      data = [
+        { label: "ID:", value: properties.id },
+        { label: "Material:", value: propertiesObj.material },
+        { label: "Layer:", value: propertiesObj.layer },
+      ];
+    }
+    else{
+      data = [
+        { label: "Quốc gia:", value: properties.COUNTRY },
+        { label: "Khu vực:", value: properties.ENGTYPE_1 },
+        { label: "Vùng:", value: properties.NAME_1 },
+      ];
+    }
 
     for (let i = 0; i < data.length; i++) {
       let paragraph = document.createElement("p");
@@ -1051,7 +1062,7 @@ let drawMeasure; // global so we can remove it later
 
 function addMeasureInteraction() {
   const drawType = typeSelectMeasure?.value;
-  if (drawType && drawType !== "None-Measure") {
+  if (drawType && drawType !== "NoneMeasure") {
     const activeTip =
       "Click to continue drawing the " +
       (drawType === "Polygon" ? "polygon" : "line");
@@ -1094,17 +1105,4 @@ addMeasureInteraction();
 showSegments?.addEventListener('change', function (e) {
   vector.changed();
   drawMeasure.getOverlay().changed();
-});
-
-
-// Lấy danh sách các phần tử <li>
-const listItems = document.querySelectorAll('#myList li');
-
-// Lặp qua từng phần tử <li> và gắn sự kiện click
-listItems.forEach(function (item) {
-  item.addEventListener('click', function () {
-    // Lấy giá trị của phần tử <li> được nhấp vào
-    const value = this.textContent;
-    console.log(value); // In giá trị ra console
-  });
 });
