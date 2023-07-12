@@ -311,3 +311,6 @@ label[for] {
     border-radius: 0.2rem;
     margin-bottom: 0.2rem;
 }
+.d-none{
+    display: none;
+}

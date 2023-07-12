@@ -13,17 +13,19 @@
 <script defer src="map-bundle.js"></script></head>
 
 <body>
-  <div class="image-container">
-    <div class="image-overlay"></div>
-    <div class="image-title">
-      <p>
-        Mông Dương
-      </p>
-    </div>
-  </div>
+  
 
   <div id="content">
+    
     <div id="menu" class="p-4">
+      <div class="image-container">
+        <div class="image-overlay"></div>
+        <div class="image-title">
+          <p>
+            Mông Dương
+          </p>
+        </div>
+      </div>
       <div class="img-menu-class">
         <img width="60" height="60"
           src="https://img.icons8.com/external-microdots-premium-microdot-graphic/60/external-choose-file-document-microdots-premium-microdot-graphic.png"
@@ -36,7 +38,6 @@
         <option value="modify"> Kéo thả </option>
         <option value="measure">Đo lường </option>
         <option value="new">Thêm địa điểm </option>
-        <option value="color">Phối màu tỉnh </option>
         <!-- <option value="draw">Vẽ một tính năng mới</option> -->
       </select>
 
@@ -69,7 +70,7 @@
         <div id="measure-feature-section" class="form-group p-4" style="display: none;">
           <label for="typeMeasure">Loại đo lường &nbsp;</label>
           <select id="typeMeasure" class="form-control mt-4 mb-4">
-            <option value="None-Measure">Không</option>
+            <option value="NoneMeasure">Không</option>
             <option value="LineString">Độ dài (Đường)</option>
             <option value="Polygon">Vùng (Đa giác)</option>
           </select>
