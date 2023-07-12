@@ -292,15 +292,16 @@ function handleDragEvent(evt) {
 
 
   deleteLayer(map, 'vectorLineLayer');
-
+  console.log("this.feature_.type_", this.feature_.type_)
   if(this.feature_.type_==="Polygon" || this.feature_.type_==="LineString"|| this.feature_.type_==="MultiLineString"){	
 		FlatCoordinates = this.feature_.getFlatCoordinates();
 		ends= this.feature_.getEnds();
 		gid = this.feature_.getProperties().gid;
 
 	}
+
 	else{
-		FlatCoordinates = this.feature_.values_.geometry.getFlatCoordinates();
+		FlatCoordinates = this.feature_?.values_?.geometry?.getFlatCoordinates();
 		ends = this.feature_.values_.geometry.getEnds();
 		gid = this.feature_.id_;
 
