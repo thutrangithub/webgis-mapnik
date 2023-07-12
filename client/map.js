@@ -19,7 +19,6 @@ import Style from "ol/style/Style.js";
 import "ol/layer/Vector.js";
 import {
   Modify,
-  defaults as defaultInteractions,
 } from "ol/interaction.js";
 import { Pointer as PointerInteraction } from "ol/interaction.js";
 import Feature from "ol/Feature.js";
@@ -28,7 +27,7 @@ import { Point, Polygon } from "ol/geom";
 import Draw from "ol/interaction/Draw.js";
 import { getArea, getLength } from "ol/sphere.js";
 import RenderFeature from "ol/render/Feature";
-import { deleteLayer, drawFeature, drawLine } from "./function";
+import { deleteLayer, drawFeature, drawLine } from "./functions";
 import OSM from "ol/source/OSM.js";
 import jscolor from "./plugins/jscolor.js";
 // ********************************** Start coding ********************************** //
@@ -242,20 +241,22 @@ function handleDownEvent(evt) {
   });
 
   if (feature) {
-    this.coordinate_ = evt.coordinate;
-    this.feature_ = feature;
-
-  }
-
-  if (this.feature_ && this.feature_.type_ == "Polygon") {
-    var FlatCoordinates = this.feature_.getFlatCoordinates();
-    var gid = this.feature_.getProperties().gid;
-
-    drawFeature(map, FlatCoordinates, 0, null, new Style({
-      fill: new Fill({ color: '#ece8ae', weight: 4 }),
-      stroke: new Stroke({ color: 'blue', width: 2 })
-    }), gid);
-  }
+    //   console.log(feature);
+      this.coordinate_ = evt.coordinate;
+      this.feature_ = feature;
+  
+      if(this.feature_.type_==="Polygon" || this.feature_.type_==="LineString"|| this.feature_.type_==="MultiLineString"){		
+      var FlatCoordinates = feature.getFlatCoordinates();
+      var gid = feature.getProperties().gid;
+  
+      }
+    else{
+      if(this.feature_.id_== 99999){
+        return false;
+      }
+  
+    }
+    }  
 
   return !!feature;
 
@@ -277,21 +278,31 @@ function handleDragEvent(evt) {
 
   var points = [clickPoint, [this.coordinate_[0], this.coordinate_[1]]];
 
+  let gid = null;
+	let FlatCoordinates = null;
+	let ends = null; 
+
+
   deleteLayer(map, 'vectorLineLayer');
 
-  // var featureLine = new Feature({
-  //   geometry: new LineString(points),
-  // });
+  if(this.feature_.type_==="Polygon" || this.feature_.type_==="LineString"|| this.feature_.type_==="MultiLineString"){	
+					console.log("LineString",this.feature_, this.feature_.getFlatCoordinates());
 
-  if (this.feature_.type_ == "Polygon") {
-    var FlatCoordinates = this.feature_.getFlatCoordinates();
-  }
-  else {
-    var FlatCoordinates = this.feature_.values_.geometry.getFlatCoordinates();
-  }
+		FlatCoordinates = this.feature_.getFlatCoordinates();
+		ends= this.feature_.getEnds();
+		gid = this.feature_.getProperties().gid;
 
-  drawLine(map, points)
-  drawFeature(map, FlatCoordinates, 1, points, null);
+	}
+	else{
+    console.log("hi", this.feature_)
+		FlatCoordinates = this.feature_.values_.geometry.getFlatCoordinates();
+		ends = this.feature_.values_.geometry.getEnds();
+		gid = this.feature_.id_;
+
+	}
+
+  drawLine(map,points)
+	drawFeature(map,FlatCoordinates,ends,1,points,null,gid,"vectorLineLayer");	
 
 }
 
@@ -324,12 +335,12 @@ function handleMoveEvent(evt) {
  * @return {boolean} `false` to stop the drag sequence.
  */
 
-function updateDraggedFeatureCount() {
-  const countElement = document.getElementById("dragged-feature-count");
-  countElement.textContent = draggedFeatureIds.length;
-  document.getElementById("dragged-ids").textContent =
-    "Danh sách id tính năng đã được kéo: " + draggedFeatureIds.join(",");
-}
+// function updateDraggedFeatureCount() {
+//   const countElement = document.getElementById("dragged-feature-count");
+//   countElement.textContent = draggedFeatureIds.length;
+//   document.getElementById("dragged-ids").textContent =
+//     "Danh sách id tính năng đã được kéo: " + draggedFeatureIds.join(",");
+// }
 
 // init variable store polygon
 
@@ -339,94 +350,139 @@ function handleUpEvent(evt) {
 
   let gid = null;
   let FlatCoordinates = null;
+  let ends = null;
 
 
-  if (this.feature_.type_ == "Polygon") {
-    FlatCoordinates = this.feature_.getFlatCoordinates();
-    gid = this.feature_.getProperties().gid;
-
-  }
-  else {
-    FlatCoordinates = this.feature_.values_.geometry.getFlatCoordinates();
-    gid = this.feature_.id_;
-
-  }
-
-  var points = [clickPoint, [this.coordinate_[0], this.coordinate_[1]]];
-
-
-
-  drawFeature(map, FlatCoordinates, 1, points, new Style({
-    fill: new Fill({ color: '#ece8ae', weight: 4 }),
-    stroke: new Stroke({ color: 'green', width: 2 })
-  }), gid);
-
-
-  map.getLayers().forEach((layer) => {
-    if (layer.getClassName() == "vectorLineLayer") {
-      map.removeLayer(layer);
+  if(this.feature_.type_==="Polygon" || this.feature_.type_==="LineString"|| this.feature_.type_==="MultiLineString"){
+		FlatCoordinates = this.feature_.getFlatCoordinates();
+    console.log("gid", this.feature_.getProperties())
+		ends = this.feature_.getEnds();
+    if(this.feature_.getProperties().hasOwnProperty("gid")){
+      gid = this.feature_.getProperties().gid;
     }
-  });
-  // check intance of RenderFeature
-  if (this.feature_ instanceof RenderFeature) {
-    FlatCoordinates = this.feature_.getFlatCoordinates();
-  }
+    else if (this.feature_.getProperties().hasOwnProperty("id")){
+      gid = this.feature_.getProperties().id;
 
-  var coordinates = [[]];
-  var i = 0;
-  while (i < FlatCoordinates.length) {
-    coordinates[0][i / 2] = [FlatCoordinates[i], FlatCoordinates[i + 1]];
-    i = i + 2;
-  }
+    }
+		if(deltaXTotal!=0 || deltaYTotal!=0){
+			drawFeature(map,FlatCoordinates,ends,0,null,new Style({
+				fill: new Fill({ color: '#ece8ae', weight: 4 }),
+				stroke: new Stroke({ color: 'blue', width: 2 })
+			}),99999,"layer");
+		}
+	}
+	else{
+		FlatCoordinates = this.feature_.values_.geometry.getFlatCoordinates();
+		ends = this.feature_.values_.geometry.getEnds();
+		gid = this.feature_.id_;
 
-  var featureNewPolygon = new Feature({
-    geometry: new Polygon(coordinates),
-  });
+	}
 
   var points = [clickPoint, [this.coordinate_[0], this.coordinate_[1]]];
 
-  featureNewPolygon
-    .getGeometry()
-    .translate(points[1][0] - points[0][0], points[1][1] - points[0][1]);
+  if(deltaXTotal!=0 || deltaYTotal!=0){
+		try{
+			if(this.feature_.type_==="Polygon" || this.feature_.type_==="LineString"|| this.feature_.type_==="MultiLineString"){
+				modifications.push([gid,deltaXTotal,deltaYTotal]);
+			}
+			else{
+				let i = 0;
+				while(i<modifications.length && modifications[i][0]!=this.feature_.id_){
+					i++;
+				}
+				modifications[i][1]+=deltaXTotal;
+				modifications[i][2]+=deltaYTotal;
+				deleteLayer(map,"vectorLayer"+gid);
+			}
+			drawFeature(map,FlatCoordinates,ends,1,points,new Style({
+				fill: new Fill({ color: '#ece8ae', weight: 4 }),
+				stroke: new Stroke({ color: 'green', width: 2 })
+			}),gid,"vectorLayer"+gid);
 
-  var featurePolygon = new Feature({
-    geometry: new Polygon(coordinates),
-  });
-  var vectorCommitSource = new VectorSource({});
-  var vectorNewCommitSource = new VectorSource({});
+			//add the modification to the modifications array
+      let counter = document.createElement("div");
+      counter.innerHTML = "Số feature thực hiện kéo thả: <span style='color: red'>" + modifications.length + "</span>";
 
-  vectorCommitSource.addFeature(featurePolygon);
-  vectorNewCommitSource.addFeature(featureNewPolygon);
 
-  var vectorCommitLayer = new VectorLayer({
-    source: vectorCommitSource,
-    style: new Style({
-      fill: new Fill({ color: "#ece8ae", weight: 4 }),
-      stroke: new Stroke({ color: "blue", width: 2 }),
-    }),
-  });
+			if(document.getElementById("commit").children.length){
+				//update the counter of modifications
+				document.getElementById("commit").removeChild(document.getElementById("commit").firstChild);
+				document.getElementById("commit").prepend(counter);
 
-  var vectorNewCommitLayer = new VectorLayer({
-    source: vectorNewCommitSource,
-    style: new Style({
-      fill: new Fill({ color: "rgba(255, 100, 100, 0.3)", weight: 4 }),
-      stroke: new Stroke({ color: "rgba(255, 80, 80, 0.9)", width: 2 }),
-    }),
-  });
 
-  //add the layers
-  if (this.feature_ instanceof Feature) {
-  }
-  map.addLayer(vectorCommitLayer);
-  map.addLayer(vectorNewCommitLayer);
+			}
+			else{
+				//add the counter of modifications
+				document.getElementById("commit").prepend(counter);
 
-  if (gid) {
-    draggedFeatureIds.push(gid);
-  }
-  if (deltaXTotal != 0 || deltaYTotal != 0) {
-    draggedFeatureCount += 1;
-    updateDraggedFeatureCount();
-  }
+				//add the textarea for the commit message
+				let modif = document.createElement("textarea");
+				modif.value="your commit message";
+				modif.style.width='90%';
+				modif.style.height='100px';
+				document.getElementById("commit").appendChild(modif);
+
+				//add the commit button
+				let button = document.createElement("button");
+        button.id = 'save-button'; 
+
+				button.innerHTML="Lưu thông tin";
+				button.onclick = function(){	
+					try{
+						if(modifications.length==0){
+							alert("Nothing to commit");
+						}
+						else if(modif.value=="your commit message"){
+							alert("You have to change the commit message!");
+						}
+						else{
+							console.log("you commit");
+							let requestOptions = {
+								method: 'PUT',
+								headers: { 'Content-Type': 'application/json' },
+								body: JSON.stringify({message:modif.innerHTML,modifications:modifications}),
+							};
+
+							//fetch the modifications to the server
+							fetch('/commit/',
+								requestOptions
+							)
+							webSocket.send("Database update");
+							//clean the commit message and moficactions array
+							modifications=[];
+							document.getElementById("commit").removeChild(document.getElementById("commit").firstChild);
+              counter.innerHTML = "Số feature thực hiện kéo thả: <span style='color: red'>" + modifications.length + "</span>";
+							document.getElementById("commit").prepend(counter);
+							modif.value="your commit message";
+
+							deleteLayer(map,'vectorLineLayer');
+							//refresh the map after the commit
+							refreshLayer(map);
+
+						}
+					}
+					catch{
+						console.log("error while committing changes")
+					}
+					
+					
+				}; 
+				document.getElementById("commit").appendChild(button);
+			}
+		}
+		catch(error){
+			console.log(error);
+		}
+	}
+
+
+  // if (gid) {
+  //   draggedFeatureIds.push(gid);
+  // }
+  // if (deltaXTotal != 0 || deltaYTotal != 0) {
+  //   draggedFeatureCount += 1;
+  //   updateDraggedFeatureCount();
+  // }
 
   this.coordinate_ = null;
   this.feature_ = null;
@@ -438,36 +494,42 @@ function handleUpEvent(evt) {
 
 const drag = new Drag();
 
-// let modifications = [];
+let modifications = [];
+let listenerKey=null;
 
 function removeInteractions() {
-  map.removeInteraction(drag);
-}
+	map.removeInteraction(drag);
+	// map.removeInteraction(selectInteraction);
+	if(listenerKey){
+		unByKey(listenerKey);
+	}
+  }
 
-const saveButton = document.getElementById("save-button");
-saveButton?.addEventListener("click", () => {
-  const requestOptions = {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(draggedFeatureIds),
-  };
 
-  fetch("/api/your-endpoint", requestOptions)
-    .then((response) => {
-      // Handle the response from the server
-      if (response.ok) {
-        // Handle success
-        console.log("Save successful");
-      } else {
-        // Handle failure
-        console.error("Save failed");
-      }
-    })
-    .catch((error) => {
-      // Error occurred
-      console.error("An error occurred", error);
-    });
-});
+// const saveButton = document.getElementById("save-button");
+// saveButton?.addEventListener("click", () => {
+//   const requestOptions = {
+//     method: "POST",
+//     headers: { "Content-Type": "application/json" },
+//     body: JSON.stringify(draggedFeatureIds),
+//   };
+
+//   fetch("/api/your-endpoint", requestOptions)
+//     .then((response) => {
+//       // Handle the response from the server
+//       if (response.ok) {
+//         // Handle success
+//         console.log("Save successful");
+//       } else {
+//         // Handle failure
+//         console.error("Save failed");
+//       }
+//     })
+//     .catch((error) => {
+//       // Error occurred
+//       console.error("An error occurred", error);
+//     });
+// });
 
 const mode = document.getElementById("mode");
 

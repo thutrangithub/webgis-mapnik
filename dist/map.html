@@ -42,14 +42,15 @@
 
       <!-- Button save after Modifying -->
       <div id="dragged-feature-section" class="form-group" style="display: none;">
-        <label for="dragged-feature-count">Số tính năng đã được kéo:</label>
-        <span id="dragged-feature-count">0</span>
+        <!-- <label for="dragged-feature-count">Số feature kéo thả:</label> -->
+        <!-- <span id="dragged-feature-count">0</span> -->
+        <div id="commit"></div>
+
         <br>
         <span id="dragged-ids"></span>
-        <button id="save-button">Lưu thông tin</button>
+        <!-- <button id="save-button">Lưu thông tin</button> -->
       </div>
       <div id="selected" class="form-group p-4" style="display: none;"></div>
-      <div id="commit"></div>
 
       <!-- Draw new feature -->
       <form>
@@ -69,7 +70,7 @@
         <div id="measure-feature-section" class="form-group p-4" style="display: none;">
           <label for="typeMeasure">Loại đo lường &nbsp;</label>
           <select id="typeMeasure" class="form-control mt-4 mb-4">
-            <option value="None-Measure">Không</option>
+            <option value="NoneMeasure">Không</option>
             <option value="LineString">Độ dài (Đường)</option>
             <option value="Polygon">Vùng (Đa giác)</option>
           </select>
