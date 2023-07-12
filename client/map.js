@@ -70,6 +70,7 @@ const layers = [
   {
     title: "Bản đồ Thế giới",
     shown: true,
+    visible: true,
     layer: new TileLayer({
       source: new OSM(),
       label: "OpenStreetMap",
@@ -80,6 +81,7 @@ const layers = [
   {
     title: "Bản đồ Việt Nam",
     shown: true,
+    visible: true,
     layer: new VectorTileLayer({
       source: source,
       style: country,
@@ -89,6 +91,7 @@ const layers = [
   {
     title: "Mông Dương - Quảng Ninh",
     shown: true,
+    visible: true,
     layer: new VectorTileLayer({
       source: source_,
       style: country,
@@ -98,6 +101,7 @@ const layers = [
   {
     title: "Tọa độ z:x:y",
     shown: true,
+    visible: true,
     layer: new TileLayer({
       source: new TileDebug(),
     }),
@@ -106,6 +110,7 @@ const layers = [
   {
     title: "Nền",
     shown: true,
+    visible: false,
     layer: vector,
     icon: "https://img.icons8.com/external-flat-design-circle/50/external-background-camping-flat-design-circle.png"
   },
@@ -128,6 +133,9 @@ layers.forEach((l) => {
   // Create a div wrapper
   const divWrapper = document.createElement("div");
   divWrapper.classList.add("wrapper-class");
+  if (!l.visible) {
+    divWrapper.classList.add("d-none");
+  }
 
   const checkboxTitleWrapper = document.createElement("div");
   checkboxTitleWrapper.classList.add("checkbox-title-wrapper-class");
@@ -540,8 +548,8 @@ mode?.addEventListener("change", function (e) {
   const measureFeatureSection = document.getElementById(
     "measure-feature-section"
   );
-
   switch (modeValue) {
+
     case "none": {
       // saveButton.style.display = 'none';
       draggedFeatureSection.style.display = "none";
@@ -570,6 +578,7 @@ mode?.addEventListener("change", function (e) {
       drawFeatureSection.style.display = "none"; // Hide draw-feature-section
       measureFeatureSection.style.display = "block"; // Hide measure-feature-section
       map.addInteraction(drag);
+      map.removeInteraction(drawMeasure);
       break;
     }
     case "new": {
@@ -601,7 +610,8 @@ const popup = document.getElementById("popup");
 
 const handleNewFeature = (e) => {
   e.preventDefault();
-  alert('Thêm địa điểm mới thành công.')
+  let color = e.target.querySelector('input[name="color"]').value;
+  alert('Thêm địa điểm mới thành công.' + color)
   // call api
 }
 const handleSetColorFeature = (e) => {
@@ -703,6 +713,22 @@ map.on("singleclick", function (e) {
     formGroup.appendChild(inputLattidute);
     divWrapper.appendChild(formGroup);
 
+    let colorPicker = document.createElement('input');
+    colorPicker.setAttribute('data-jscolor', '{}');
+    colorPicker.setAttribute('name', 'color');
+    colorPicker.value = "#3399FF80";
+    colorPicker.classList.add('form-control');
+    let picker = new JSColor(colorPicker);
+
+    formGroup = document.createElement('div');
+    formGroup.classList.add('form-group');
+    label = document.createElement('label');
+    label.classList.add('label');
+    label.textContent = "Chọn màu sắc";
+    formGroup.appendChild(label);
+    formGroup.appendChild(colorPicker);
+    divWrapper.appendChild(formGroup);
+
     divWrapper.appendChild(formAction);
 
     let form = document.createElement('form');
@@ -729,81 +755,6 @@ map.on("singleclick", function (e) {
     handleHidePopup();
     return;
   }
-  // color feature
-  if (mode.value === "color" && point) {
-    let popupContent = document.createElement("div");
-
-    let divWrapper = document.createElement("div");
-    divWrapper.classList.add('content-popup-class');
-
-    let inputName = document.createElement("input");
-    inputName.setAttribute('name', 'name');
-    inputName.setAttribute('type', 'text');
-    inputName.classList.add('form-control');
-    inputName.setAttribute('readonly', true);
-    inputName.value = feature.properties_.NAME_1;
-
-    let formAction = document.createElement('div');
-    formAction.classList.add('form-action', 'text-center');
-    let buttonSubmit = document.createElement('button');
-    buttonSubmit.setAttribute('type', 'submit');
-    buttonSubmit.classList.add('btn', 'btn-primary');
-    buttonSubmit.textContent = "Lưu";
-    formAction.appendChild(buttonSubmit);
-
-    let colorPicker = document.createElement('input');
-    colorPicker.setAttribute('data-jscolor', '{}');
-    colorPicker.setAttribute('name', 'color');
-    colorPicker.value = "#3399FF80";
-    colorPicker.classList.add('form-control');
-
-    let picker = new JSColor(colorPicker);
-
-    // name wrapper
-    let formGroup = document.createElement('div');
-    formGroup.classList.add('form-group');
-    let label = document.createElement('label');
-    label.classList.add('label');
-    label.textContent = "Tên tỉnh thành";
-    formGroup.appendChild(label);
-    formGroup.appendChild(inputName);
-    divWrapper.appendChild(formGroup);
-    // color picker
-    formGroup = document.createElement('div');
-    formGroup.classList.add('form-group');
-    label = document.createElement('label');
-    label.classList.add('label');
-    label.textContent = "Chọn màu sắc";
-    formGroup.appendChild(label);
-    formGroup.appendChild(colorPicker);
-    divWrapper.appendChild(formGroup);
-
-    divWrapper.appendChild(formAction);
-
-    let form = document.createElement('form');
-    form.setAttribute('id', 'form-set-color-feature');
-    form.setAttribute('method', 'post');
-    form.setAttribute('action', '/set-color-feature');
-    form.appendChild(divWrapper);
-
-    form.addEventListener('submit', (e) => {
-      handleSetColorFeature(e);
-    })
-
-    popupContent.appendChild(form);
-
-    // Đặt nội dung cho popup
-    popup.querySelector('.popup-title').textContent = "Chọn màu sắc cho tỉnh thành";
-    document.getElementById("popup-content").innerHTML = "";
-    document.getElementById("popup-content").appendChild(popupContent);
-
-    // Hiển thị popup
-    popup.style.display = "block";
-    popup.style.left = e.pixel[0] + "px";
-    popup.style.top = e.pixel[1] + "px";
-    handleHidePopup();
-    return;
-  }
   // not modify mode
   if (mode.value !== "none") {
     return;
@@ -815,8 +766,8 @@ map.on("singleclick", function (e) {
 
     let properties = f.getProperties();
 
-    let data =[]
-    if(properties.hasOwnProperty("properties")){
+    let data = []
+    if (properties.hasOwnProperty("properties")) {
       const propertiesObj = JSON.parse(properties.properties);
       data = [
         { label: "ID:", value: properties.id },
@@ -824,7 +775,7 @@ map.on("singleclick", function (e) {
         { label: "Layer:", value: propertiesObj.layer },
       ];
     }
-    else{
+    else {
       data = [
         { label: "Quốc gia:", value: properties.COUNTRY },
         { label: "Khu vực:", value: properties.ENGTYPE_1 },
