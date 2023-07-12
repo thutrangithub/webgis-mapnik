@@ -286,15 +286,12 @@ function handleDragEvent(evt) {
   deleteLayer(map, 'vectorLineLayer');
 
   if(this.feature_.type_==="Polygon" || this.feature_.type_==="LineString"|| this.feature_.type_==="MultiLineString"){	
-					console.log("LineString",this.feature_, this.feature_.getFlatCoordinates());
-
 		FlatCoordinates = this.feature_.getFlatCoordinates();
 		ends= this.feature_.getEnds();
 		gid = this.feature_.getProperties().gid;
 
 	}
 	else{
-    console.log("hi", this.feature_)
 		FlatCoordinates = this.feature_.values_.geometry.getFlatCoordinates();
 		ends = this.feature_.values_.geometry.getEnds();
 		gid = this.feature_.id_;
@@ -344,7 +341,6 @@ function handleMoveEvent(evt) {
 
 // init variable store polygon
 
-
 function handleUpEvent(evt) {
   deleteLayer(map, 'vectorLineLayer');
 
@@ -355,7 +351,6 @@ function handleUpEvent(evt) {
 
   if(this.feature_.type_==="Polygon" || this.feature_.type_==="LineString"|| this.feature_.type_==="MultiLineString"){
 		FlatCoordinates = this.feature_.getFlatCoordinates();
-    console.log("gid", this.feature_.getProperties())
 		ends = this.feature_.getEnds();
     if(this.feature_.getProperties().hasOwnProperty("gid")){
       gid = this.feature_.getProperties().gid;
