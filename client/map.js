@@ -250,21 +250,21 @@ function handleDownEvent(evt) {
 
   if (feature) {
     //   console.log(feature);
-      this.coordinate_ = evt.coordinate;
-      this.feature_ = feature;
-  
-      if(this.feature_.type_==="Polygon" || this.feature_.type_==="LineString"|| this.feature_.type_==="MultiLineString"){		
+    this.coordinate_ = evt.coordinate;
+    this.feature_ = feature;
+
+    if (this.feature_.type_ === "Polygon" || this.feature_.type_ === "LineString" || this.feature_.type_ === "MultiLineString") {
       var FlatCoordinates = feature.getFlatCoordinates();
       var gid = feature.getProperties().gid;
-  
-      }
-    else{
-      if(this.feature_.id_== 99999){
+
+    }
+    else {
+      if (this.feature_.id_ == 99999) {
         return false;
       }
-  
+
     }
-    }  
+  }
 
   return !!feature;
 
@@ -287,27 +287,27 @@ function handleDragEvent(evt) {
   var points = [clickPoint, [this.coordinate_[0], this.coordinate_[1]]];
 
   let gid = null;
-	let FlatCoordinates = null;
-	let ends = null; 
+  let FlatCoordinates = null;
+  let ends = null;
 
 
   deleteLayer(map, 'vectorLineLayer');
 
-  if(this.feature_.type_==="Polygon" || this.feature_.type_==="LineString"|| this.feature_.type_==="MultiLineString"){	
-		FlatCoordinates = this.feature_.getFlatCoordinates();
-		ends= this.feature_.getEnds();
-		gid = this.feature_.getProperties().gid;
+  if (this.feature_.type_ === "Polygon" || this.feature_.type_ === "LineString" || this.feature_.type_ === "MultiLineString") {
+    FlatCoordinates = this.feature_.getFlatCoordinates();
+    ends = this.feature_.getEnds();
+    gid = this.feature_.getProperties().gid;
 
-	}
-	else{
-		FlatCoordinates = this.feature_.values_.geometry.getFlatCoordinates();
-		ends = this.feature_.values_.geometry.getEnds();
-		gid = this.feature_.id_;
+  }
+  else {
+    FlatCoordinates = this.feature_.values_.geometry.getFlatCoordinates();
+    ends = this.feature_.values_.geometry.getEnds();
+    gid = this.feature_.id_;
 
-	}
+  }
 
-  drawLine(map,points)
-	drawFeature(map,FlatCoordinates,ends,1,points,null,gid,"vectorLineLayer");	
+  drawLine(map, points)
+  drawFeature(map, FlatCoordinates, ends, 1, points, null, gid, "vectorLineLayer");
 
 }
 
@@ -357,126 +357,126 @@ function handleUpEvent(evt) {
   let ends = null;
 
 
-  if(this.feature_.type_==="Polygon" || this.feature_.type_==="LineString"|| this.feature_.type_==="MultiLineString"){
-		FlatCoordinates = this.feature_.getFlatCoordinates();
-		ends = this.feature_.getEnds();
-    if(this.feature_.getProperties().hasOwnProperty("gid")){
+  if (this.feature_.type_ === "Polygon" || this.feature_.type_ === "LineString" || this.feature_.type_ === "MultiLineString") {
+    FlatCoordinates = this.feature_.getFlatCoordinates();
+    ends = this.feature_.getEnds();
+    if (this.feature_.getProperties().hasOwnProperty("gid")) {
       gid = this.feature_.getProperties().gid;
     }
-    else if (this.feature_.getProperties().hasOwnProperty("id")){
+    else if (this.feature_.getProperties().hasOwnProperty("id")) {
       gid = this.feature_.getProperties().id;
 
     }
-		if(deltaXTotal!=0 || deltaYTotal!=0){
-			drawFeature(map,FlatCoordinates,ends,0,null,new Style({
-				fill: new Fill({ color: '#ece8ae', weight: 4 }),
-				stroke: new Stroke({ color: 'blue', width: 2 })
-			}),99999,"layer");
-		}
-	}
-	else{
-		FlatCoordinates = this.feature_.values_.geometry.getFlatCoordinates();
-		ends = this.feature_.values_.geometry.getEnds();
-		gid = this.feature_.id_;
+    if (deltaXTotal != 0 || deltaYTotal != 0) {
+      drawFeature(map, FlatCoordinates, ends, 0, null, new Style({
+        fill: new Fill({ color: '#ece8ae', weight: 4 }),
+        stroke: new Stroke({ color: 'blue', width: 2 })
+      }), 99999, "layer");
+    }
+  }
+  else {
+    FlatCoordinates = this.feature_.values_.geometry.getFlatCoordinates();
+    ends = this.feature_.values_.geometry.getEnds();
+    gid = this.feature_.id_;
 
-	}
+  }
 
   var points = [clickPoint, [this.coordinate_[0], this.coordinate_[1]]];
 
-  if(deltaXTotal!=0 || deltaYTotal!=0){
-		try{
-			if(this.feature_.type_==="Polygon" || this.feature_.type_==="LineString"|| this.feature_.type_==="MultiLineString"){
-				modifications.push([gid,deltaXTotal,deltaYTotal]);
-			}
-			else{
-				let i = 0;
-				while(i<modifications.length && modifications[i][0]!=this.feature_.id_){
-					i++;
-				}
-				modifications[i][1]+=deltaXTotal;
-				modifications[i][2]+=deltaYTotal;
-				deleteLayer(map,"vectorLayer"+gid);
-			}
-			drawFeature(map,FlatCoordinates,ends,1,points,new Style({
-				fill: new Fill({ color: '#ece8ae', weight: 4 }),
-				stroke: new Stroke({ color: 'green', width: 2 })
-			}),gid,"vectorLayer"+gid);
+  if (deltaXTotal != 0 || deltaYTotal != 0) {
+    try {
+      if (this.feature_.type_ === "Polygon" || this.feature_.type_ === "LineString" || this.feature_.type_ === "MultiLineString") {
+        modifications.push([gid, deltaXTotal, deltaYTotal]);
+      }
+      else {
+        let i = 0;
+        while (i < modifications.length && modifications[i][0] != this.feature_.id_) {
+          i++;
+        }
+        modifications[i][1] += deltaXTotal;
+        modifications[i][2] += deltaYTotal;
+        deleteLayer(map, "vectorLayer" + gid);
+      }
+      drawFeature(map, FlatCoordinates, ends, 1, points, new Style({
+        fill: new Fill({ color: '#ece8ae', weight: 4 }),
+        stroke: new Stroke({ color: 'green', width: 2 })
+      }), gid, "vectorLayer" + gid);
 
-			//add the modification to the modifications array
+      //add the modification to the modifications array
       let counter = document.createElement("div");
       counter.innerHTML = "Số feature thực hiện kéo thả: <span style='color: red'>" + modifications.length + "</span>";
 
 
-			if(document.getElementById("commit").children.length){
-				//update the counter of modifications
-				document.getElementById("commit").removeChild(document.getElementById("commit").firstChild);
-				document.getElementById("commit").prepend(counter);
+      if (document.getElementById("commit").children.length) {
+        //update the counter of modifications
+        document.getElementById("commit").removeChild(document.getElementById("commit").firstChild);
+        document.getElementById("commit").prepend(counter);
 
 
-			}
-			else{
-				//add the counter of modifications
-				document.getElementById("commit").prepend(counter);
+      }
+      else {
+        //add the counter of modifications
+        document.getElementById("commit").prepend(counter);
 
-				//add the textarea for the commit message
-				let modif = document.createElement("textarea");
-				modif.value="your commit message";
-				modif.style.width='90%';
-				modif.style.height='100px';
-				document.getElementById("commit").appendChild(modif);
+        //add the textarea for the commit message
+        let modif = document.createElement("textarea");
+        modif.value = "your commit message";
+        modif.style.width = '90%';
+        modif.style.height = '100px';
+        document.getElementById("commit").appendChild(modif);
 
-				//add the commit button
-				let button = document.createElement("button");
-        button.id = 'save-button'; 
+        //add the commit button
+        let button = document.createElement("button");
+        button.id = 'save-button';
 
-				button.innerHTML="Lưu thông tin";
-				button.onclick = function(){	
-					try{
-						if(modifications.length==0){
-							alert("Nothing to commit");
-						}
-						else if(modif.value=="your commit message"){
-							alert("You have to change the commit message!");
-						}
-						else{
-							console.log("you commit");
-							let requestOptions = {
-								method: 'PUT',
-								headers: { 'Content-Type': 'application/json' },
-								body: JSON.stringify({message:modif.innerHTML,modifications:modifications}),
-							};
+        button.innerHTML = "Lưu thông tin";
+        button.onclick = function () {
+          try {
+            if (modifications.length == 0) {
+              alert("Nothing to commit");
+            }
+            else if (modif.value == "your commit message") {
+              alert("You have to change the commit message!");
+            }
+            else {
+              console.log("you commit");
+              let requestOptions = {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: modif.innerHTML, modifications: modifications }),
+              };
 
-							//fetch the modifications to the server
-							fetch('/commit/',
-								requestOptions
-							)
-							webSocket.send("Database update");
-							//clean the commit message and moficactions array
-							modifications=[];
-							document.getElementById("commit").removeChild(document.getElementById("commit").firstChild);
+              //fetch the modifications to the server
+              fetch('/commit/',
+                requestOptions
+              )
+              webSocket.send("Database update");
+              //clean the commit message and moficactions array
+              modifications = [];
+              document.getElementById("commit").removeChild(document.getElementById("commit").firstChild);
               counter.innerHTML = "Số feature thực hiện kéo thả: <span style='color: red'>" + modifications.length + "</span>";
-							document.getElementById("commit").prepend(counter);
-							modif.value="your commit message";
+              document.getElementById("commit").prepend(counter);
+              modif.value = "your commit message";
 
-							deleteLayer(map,'vectorLineLayer');
-							//refresh the map after the commit
-							refreshLayer(map);
+              deleteLayer(map, 'vectorLineLayer');
+              //refresh the map after the commit
+              refreshLayer(map);
 
-						}
-					}
-					catch{
-						console.log("error while committing changes")
-					}
-					
-					
-				}; 
-				document.getElementById("commit").appendChild(button);
-			}
-		}
-		catch(error){
-			console.log(error);
-		}
-	}
+            }
+          }
+          catch {
+            console.log("error while committing changes")
+          }
+
+
+        };
+        document.getElementById("commit").appendChild(button);
+      }
+    }
+    catch (error) {
+      console.log(error);
+    }
+  }
 
 
   // if (gid) {
@@ -498,15 +498,15 @@ function handleUpEvent(evt) {
 const drag = new Drag();
 
 let modifications = [];
-let listenerKey=null;
+let listenerKey = null;
 
 function removeInteractions() {
-	map.removeInteraction(drag);
-	// map.removeInteraction(selectInteraction);
-	if(listenerKey){
-		unByKey(listenerKey);
-	}
+  map.removeInteraction(drag);
+  // map.removeInteraction(selectInteraction);
+  if (listenerKey) {
+    unByKey(listenerKey);
   }
+}
 
 
 // const saveButton = document.getElementById("save-button");
