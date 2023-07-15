@@ -292,7 +292,7 @@ function handleDragEvent(evt) {
 
 
   deleteLayer(map, 'vectorLineLayer');
-  console.log("this.feature_.type_", this.feature_.type_)
+  // console.log("this.feature_.type_", this.feature_.type_)
   if(this.feature_.type_==="Polygon" || this.feature_.type_==="LineString"|| this.feature_.type_==="MultiLineString"){	
 		FlatCoordinates = this.feature_.getFlatCoordinates();
 		ends= this.feature_.getEnds();
@@ -571,14 +571,16 @@ mode?.addEventListener("change", function (e) {
       drawFeatureSection.style.display = "none"; // Hide draw-feature-section
       measureFeatureSection.style.display = "none"; // Hide measure-feature-section
       map.addInteraction(drag);
+      map.removeInteraction(drawMeasure);
       break;
     }
     case "measure": {
+
       // saveButton.style.display = 'block';
       draggedFeatureSection.style.display = "none";
       drawFeatureSection.style.display = "none"; // Hide draw-feature-section
       measureFeatureSection.style.display = "block"; // Hide measure-feature-section
-      map.addInteraction(drag);
+      // map.addInteraction(drag);
       map.removeInteraction(drawMeasure);
       break;
     }

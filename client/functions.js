@@ -14,7 +14,7 @@ export function refreshLayer(map){
 export function deleteLayer(map, layerName){
 	map.getAllLayers().forEach(layer => {
 		if (layer.getClassName()== layerName){
-			console.log("delete layers");
+			// console.log("delete layers");
 			map.removeLayer(layer)
 		}
 	  });
