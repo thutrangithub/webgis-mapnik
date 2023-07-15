@@ -50,6 +50,12 @@ app.get('/map', (req, res) => {
   res.sendFile(path.join(__dirname, '../dist/map.html'));
 });
 
+app.use('/login', (req, res) => {
+  res.send({
+    token: 'test123'
+  });
+});
+
 const port = 3000;
 // Start server tại cổng ${port}
 app.listen(port, () => {

@@ -34,7 +34,7 @@
 			<div class="img-title"></div>
 		<div class="container-login100">
 			<div class="wrap-login100 p-l-55 p-r-55 p-t-40 p-b-40">
-				<form class="login100-form validate-form">
+				<form action="/login" method="post" class="login100-form validate-form">
 					<span class="login100-form-title p-b-30">
 						Login
 					</span>
@@ -47,7 +47,7 @@
 
 					<div class="wrap-input100 validate-input" data-validate="Password is required">
 						<span class="label-input100">Password</span>
-						<input class="input100" type="password" name="pass" placeholder="Type your password">
+						<input class="input100" type="password" name="password" placeholder="Type your password">
 						<span class="focus-input100" data-symbol="&#xf190;"></span>
 					</div>
 					
@@ -60,7 +60,7 @@
 					<div class="container-login100-form-btn">
 						<div class="wrap-login100-form-btn">
 							<div class="login100-form-bgbtn"></div>
-							<button class="login100-form-btn">
+							<button id="login" type="submit" class="login100-form-btn">
 								Login
 							</button>
 						</div>
@@ -124,14 +124,43 @@
 <!--===============================================================================================-->
 	<script src="login/js/main.js"></script>
 	<script>
-var myButton = document.getElementsByClassName("login100-form-btn");
+		let loginButton = document.getElementById("login");
+		const usernameInput = document.querySelector('input[name="username"]');
+		const passwordInput = document.querySelector('input[name="password"]');
+		loginButton.addEventListener("click",async (e) => {
+			e.preventDefault();
+			let username = usernameInput.value;
+			let password = passwordInput.value;
+			if(!username || !password){
+				if(!username){
+					return showValidate(usernameInput);
+				}else{
+					return showValidate(passwordInput);
+				}
+			}
+			// call api login
+			try{
+				const {token} = await login({username, password});
+				// save token to storage
+				localStorage.setItem('token', JSON.stringify(token));
+				// redirect to map dashboard
+				window.location.href = "http://localhost:3000/map"
+			}catch (error){
+				// TypeError: Failed to fetch
+				console.log('There was an error', error);
+			}
+		});
 
-function redirect() {
-	console.log("redirecting")
-  window.location.href = "http://localhost:8000/map";
-}
-
-myButton.addEventListener("click", redirect);
+		const login = async function loginUser(credentials) {
+			return fetch('http://localhost:3000/login', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(credentials)
+			})
+			.then(data => data.json())
+		}
 	</script>
 
 </body>
