@@ -50,8 +50,15 @@ SphericalMercator.prototype.ll_to_px = function(ll, zoom) {
     var f = this.minmax(Math.sin(this.DEG_TO_RAD * ll[1]), -0.9999, 0.9999);
     var x = Math.round(d + ll[0] * this.Bc[zoom]);
     var y = Math.round(d + 0.5 * Math.log((1 + f) / (1 - f)) * (-this.Cc[zoom]));
-    return [x, y];
+    return [x, y];  
 };
+SphericalMercator.prototype.ll_to_tile = function(ll,zoom){
+    var lat_rad = ll[0] * Math.PI / 180;
+    var n = 1 << zoom;
+    var xtile = Math.floor((ll[1] + 180.0) / 360.0 * n);
+    var ytile = Math.floor((1.0 - Math.asinh(Math.tan(lat_rad)) / Math.PI) / 2.0 * n);
+    return [xtile, ytile];
+}
 
 /**
  * Convert screen pixel value to lat lon

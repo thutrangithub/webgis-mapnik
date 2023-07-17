@@ -1,6 +1,9 @@
 const mapnik = require('mapnik');
 
 const mercator = require('./sphericalmercator');
+const { resolve } = require('path');
+const { rejects } = require('assert');
+const fs = require('fs').promises
 
 const TMS_SCHEME = false;
 
@@ -52,6 +55,30 @@ class MapPackage {
             const vt = new mapnik.VectorTile(z,x,y)
             vt.addGeoJSON(JSON.stringify(geojson),name)
         })
+    }
+    ToGeoJSON(z,x,y){
+        const output = "/home/khoald/projects/webgis/saveTest.geojson"
+        return new Promise((resolve,reject) => {
+            const vt = new mapnik.VectorTile(z,x,y)
+            this.map.render(vt, function(err, _vt) {
+                if (err) reject(handleError(err, "Error when setting data to vectortile"))
+                vt.toGeoJSON("__all__",async (err,geojson) => {
+                    if (err) throw err
+                    //const result = JSON.stringify(geojson)
+                    await fs.writeFile(output, geojson)
+                    console.log('done1')
+                })
+            });
+        })
+    }
+    Getbbox(x,y,z){
+        const bbox = mercator.xyz_to_envelope(x, y, z, TMS_SCHEME)
+        return bbox
+    }
+    GetTiles(lat,lon,z){
+        const x = mercator.ll_to_tile([lat,lon],z)[0]
+        const y = mercator.ll_to_tile([lat,lon],z)[1]
+        return [x,y]
     }
 }
 
