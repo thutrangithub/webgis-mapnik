@@ -30,8 +30,13 @@ import RenderFeature from "ol/render/Feature";
 import { deleteLayer, drawFeature, drawLine } from "./functions";
 import OSM from "ol/source/OSM.js";
 import jscolor from "./plugins/jscolor.js";
+import { fromLonLat, useGeographic } from "ol/proj";
+import { Overlay } from "ol";
+import {toLonLat} from 'ol/proj.js';
+import {toStringHDMS} from 'ol/coordinate.js';
 // ********************************** Start coding ********************************** //
 // style definition
+
 const country = new Style({
   stroke: new Stroke({
     color: "#ff4200",
@@ -53,7 +58,7 @@ const source = new VectorTileSource({
 
 const source_ = new VectorTileSource({
   format: new MVT(),
-  // url: "/api/vectors/{z}/{x}/{y}",
+  url: "/map/vectors/4/12/7",
 });
 
 const source__ = new VectorSource({ wrapX: false });
@@ -116,13 +121,15 @@ const layers = [
   },
 ];
 
+// useGeographic();
+
 // defintion of the map object
 const map = new Map({
   target: "map",
   layers: layers.filter((e) => e.shown).map((e) => e.layer),
   view: new View({
-    center: [0, 0],
-    zoom: 4,
+    center: fromLonLat([106.6948, 10.7769]),
+    zoom: 5,
   }),
 });
 
@@ -187,12 +194,6 @@ layers.forEach((l) => {
 
 
 // handle the choice of action
-// const typeSelect = document.getElementById("type");
-
-// const select = new Select();
-
-// const selectedFeatures = select.getFeatures();
-
 // Implement the drag interraction
 class Drag extends PointerInteraction {
   constructor() {
@@ -231,10 +232,6 @@ class Drag extends PointerInteraction {
 var deltaXTotal = 0;
 var deltaYTotal = 0;
 
-let draggedFeatureIds = [];
-
-let draggedFeatureCount = 0;
-
 var clickPoint;
 /**
  * @param {import("../src/ol/MapBrowserEvent.js").default} evt Map browser event.
@@ -249,7 +246,6 @@ function handleDownEvent(evt) {
   });
 
   if (feature) {
-    //   console.log(feature);
     this.coordinate_ = evt.coordinate;
     this.feature_ = feature;
 
@@ -277,7 +273,6 @@ function handleDownEvent(evt) {
 function handleDragEvent(evt) {
   const deltaX = evt.coordinate[0] - this.coordinate_[0];
   const deltaY = evt.coordinate[1] - this.coordinate_[1];
-
   deltaXTotal += deltaX;
   deltaYTotal += deltaY;
 
@@ -339,13 +334,6 @@ function handleMoveEvent(evt) {
 /**
  * @return {boolean} `false` to stop the drag sequence.
  */
-
-// function updateDraggedFeatureCount() {
-//   const countElement = document.getElementById("dragged-feature-count");
-//   countElement.textContent = draggedFeatureIds.length;
-//   document.getElementById("dragged-ids").textContent =
-//     "Danh sách id tính năng đã được kéo: " + draggedFeatureIds.join(",");
-// }
 
 // init variable store polygon
 
@@ -478,15 +466,6 @@ function handleUpEvent(evt) {
     }
   }
 
-
-  // if (gid) {
-  //   draggedFeatureIds.push(gid);
-  // }
-  // if (deltaXTotal != 0 || deltaYTotal != 0) {
-  //   draggedFeatureCount += 1;
-  //   updateDraggedFeatureCount();
-  // }
-
   this.coordinate_ = null;
   this.feature_ = null;
   deltaXTotal = 0;
@@ -548,24 +527,16 @@ mode?.addEventListener("change", function (e) {
   const measureFeatureSection = document.getElementById(
     "measure-feature-section"
   );
+  
   switch (modeValue) {
 
     case "none": {
-      // saveButton.style.display = 'none';
       draggedFeatureSection.style.display = "none";
       drawFeatureSection.style.display = "none"; // Hide draw-feature-section
       measureFeatureSection.style.display = "none"; // Hide measure-feature-section
       break;
     }
-    // case "draw": {
-    //   // saveButton.style.display = 'none';
-    //   draggedFeatureSection.style.display = "none";
-    //   drawFeatureSection.style.display = "block"; // Show draw-feature-section
-    //   measureFeatureSection.style.display = "none"; // Hide measure-feature-section
-    //   break;
-    // }
     case "modify": {
-      // saveButton.style.display = 'block';
       draggedFeatureSection.style.display = "block";
       drawFeatureSection.style.display = "none"; // Hide draw-feature-section
       measureFeatureSection.style.display = "none"; // Hide measure-feature-section
@@ -574,31 +545,26 @@ mode?.addEventListener("change", function (e) {
       break;
     }
     case "measure": {
-
-      // saveButton.style.display = 'block';
       draggedFeatureSection.style.display = "none";
       drawFeatureSection.style.display = "none"; // Hide draw-feature-section
       measureFeatureSection.style.display = "block"; // Hide measure-feature-section
-      // map.addInteraction(drag);
       map.removeInteraction(drawMeasure);
       break;
     }
     case "new": {
-      // saveButton.style.display = 'block';
       draggedFeatureSection.style.display = "none";
       drawFeatureSection.style.display = "none"; // Hide draw-feature-section
       measureFeatureSection.style.display = "none"; // Hide measure-feature-section
+      map.removeInteraction(drawMeasure);
       break;
     }
     case "color": {
-      // saveButton.style.display = 'block';
       draggedFeatureSection.style.display = "none";
       drawFeatureSection.style.display = "none"; // Hide draw-feature-section
       measureFeatureSection.style.display = "none"; // Hide measure-feature-section
       break;
     }
     default: {
-      // saveButton.style.display = 'none';
       draggedFeatureSection.style.display = "none";
       drawFeatureSection.style.display = "none"; // Hide draw-feature-section
       measureFeatureSection.style.display = "none"; // Hide measure-feature-section
@@ -607,8 +573,40 @@ mode?.addEventListener("change", function (e) {
 });
 
 // display data of the clicked vector
-const status = document.getElementById("status");
-const popup = document.getElementById("popup");
+
+/**
+ * Elements that make up the popup.
+ */
+const container = document.getElementById('popup');
+const closer = document.getElementById('popup-closer');
+/**
+ * Create an overlay to anchor the popup to the map.
+ */
+const overlay = new Overlay({
+  element: container,
+  autoPan: {
+    animation: {
+      duration: 250,
+    },
+  },
+});
+
+/**
+ * Add a click handler to hide the popup.
+ * @return {boolean} 
+ */
+closer.onclick = function () {
+  overlay.setPosition(undefined);
+  closer.blur();
+  return false;
+};
+
+const popup = new Overlay({
+  element: document.getElementById('popup'), 
+  positioning: 'bottom-center', 
+  stopEvent: false, 
+});
+map.addOverlay(popup);
 
 const handleNewFeature = (e) => {
   e.preventDefault();
@@ -616,18 +614,20 @@ const handleNewFeature = (e) => {
   alert('Thêm địa điểm mới thành công.' + color)
   // call api
 }
+
 const handleSetColorFeature = (e) => {
   e.preventDefault();
   let color = e.target.querySelector('input[name="color"]').value;
   alert('Màu sắc được chọn :' + color)
   // call api
 }
+
 // let's set defaults for all color pickers
 jscolor.presets.default = {
-  width: 141,               // make the picker a little narrower
-  position: 'right',        // position it to the right of the target
-  previewPosition: 'right', // display color preview on the right
-  previewSize: 40,          // make the color preview bigger
+  width: 141,               
+  position: 'right',        
+  previewPosition: 'right', 
+  previewSize: 40,          
   palette: [
     '#000000', '#7d7d7d', '#870014', '#ec1c23', '#ff7e26',
     '#fef100', '#22b14b', '#00a1e7', '#3f47cc', '#a349a4',
@@ -636,12 +636,9 @@ jscolor.presets.default = {
   ],
 };
 let selected = null;
-map.on("singleclick", function (e) {
-  while (document.getElementById("selected").firstChild) {
-    document
-      .getElementById("selected")
-      .removeChild(document.getElementById("selected").firstChild);
-  }
+
+map.on('singleclick', function (e) {
+  const coordinate = e.coordinate;
 
   if (selected !== null) {
     selected = null;
@@ -701,7 +698,7 @@ map.on("singleclick", function (e) {
     formGroup.classList.add('form-group');
     label = document.createElement('label');
     label.classList.add('label');
-    label.textContent = "Longtidute";
+    label.textContent = "Kinh độ";
     formGroup.appendChild(label);
     formGroup.appendChild(inputLongtidute);
     divWrapper.appendChild(formGroup);
@@ -710,7 +707,7 @@ map.on("singleclick", function (e) {
     formGroup.classList.add('form-group');
     label = document.createElement('label');
     label.classList.add('label');
-    label.textContent = "Lattidute";
+    label.textContent = "Vĩ độ";
     formGroup.appendChild(label);
     formGroup.appendChild(inputLattidute);
     divWrapper.appendChild(formGroup);
@@ -746,22 +743,21 @@ map.on("singleclick", function (e) {
     popupContent.appendChild(form);
 
     // Đặt nội dung cho popup
-    popup.querySelector('.popup-title').textContent = "Thêm địa điểm mới";
+    // popup.querySelector('.popup-title').textContent = "Thêm địa điểm mới";
     document.getElementById("popup-content").innerHTML = "";
     document.getElementById("popup-content").appendChild(popupContent);
-
     // Hiển thị popup
-    popup.style.display = "block";
-    popup.style.left = e.pixel[0] + "px";
-    popup.style.top = e.pixel[1] + "px";
-    handleHidePopup();
+    popup.setPosition(coordinate);
+
+    // handleHidePopup();
     return;
   }
-  // not modify mode
   if (mode.value !== "none") {
     return;
   }
-  map.forEachFeatureAtPixel(e.pixel, function (f) {
+
+    map.forEachFeatureAtPixel(e.pixel, function (f) {        
+
     selected = f;
     // Tạo nội dung cho popup 
     let popupContent = document.createElement("div");
@@ -804,50 +800,35 @@ map.on("singleclick", function (e) {
     }
 
     // Đặt nội dung cho popup
-    popup.querySelector('.popup-title').textContent = "Thông tin tính năng";
     document.getElementById("popup-content").innerHTML = "";
     document.getElementById("popup-content").appendChild(popupContent);
-
-    // Hiển thị popup
-    popup.style.display = "block";
-    popup.style.left = e.pixel[0] + "px";
-    popup.style.top = e.pixel[1] + "px";
-
-    handleHidePopup();
-    return true;
-  });
-
-  if (selected) {
-    status.innerHTML = selected.get("ECO_NAME");
-  } else {
-    status.innerHTML = "&nbsp;";
-  }
-
-  // Hiển thị hoặc ẩn popup
-  if (selected) {
-    popup.style.display = "block";
-  } else {
-    popup.style.display = "none";
-  }
+    popup.setPosition(coordinate);
+    // handleHidePopup();
+    // return true;
+  })
 });
 
 // Ẩn popup khi bấm chuột ngoài popup
-const handleHidePopup = () => {
-  document.addEventListener("click", function (e) {
-    let _popup = document.getElementById("popup");
-    let colorPicker = document.querySelector('.jscolor-picker');
-    if (!_popup.contains(e.target) && !colorPicker?.contains(e.target)) {
-      _popup.style.display = "none";
-    }
-  })
-}
+// const handleHidePopup = () => {
+//   document.addEventListener("click", function (e) {
+//     let _popup = document.getElementById("popup");
+//     if (!_popup.contains(e.target) && !colorPicker?.contains(e.target)) {
+//       _popup.style.display = "none";
+//     }
+//   })
+// }
+
+document.getElementById('popup-closer').onclick = function () {
+  popup.setPosition(undefined);
+  return false;
+};
 
 
 // Draw point, linestring, polygon, circle
 
 const typeSelection = document.getElementById("type");
 
-let draw; // global so we can remove it later
+let draw; 
 function addInteraction() {
   const value = typeSelection?.value;
   if (value && value !== "None") {

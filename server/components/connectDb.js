@@ -12,9 +12,11 @@ const initOptions = {
     }
   };
   
-  const pgp = require('pg-promise')(initOptions);
-  const db = pgp('postgresql://postgres:1@localhost:5432/webgis')
-  
+//   const dbHost = "postgres-postgis";
+  const dbHost = "localhost";
+  const pgp = require("pg-promise")(initOptions);
+  const db = pgp(`postgresql://postgres:1@${dbHost}:5432/webgis`);
+
   function getTableName(name){
     return new Promise((resolve, reject) => {
         const sql = `Select layers.tablename, spatial_ref_sys.proj4text
@@ -23,7 +25,7 @@ const initOptions = {
         on layers.crs = spatial_ref_sys.srid
         where layers.layername = '${name}'`
         db.one(sql, null, data => {
-            resolve([data.tablename,data.proj4text])
+            resolve([data.tablename, data.proj4text])
         })
     })
   }
@@ -99,7 +101,7 @@ const initOptions = {
         xml = xml.replace(/{proj_string}/, proj_string);
         xml = xml.replace(/{layer-name}/g, layerName);
         xml = xml.replace(/{database}/, dbInfo.database);
-        xml = xml.replace(/{host}/, dbInfo.dbHost);
+        xml = xml.replace(/{host}/, dbHost);
         xml = xml.replace(/{user}/, dbInfo.user);
         xml = xml.replace(/{password}/, dbInfo.password);
         resolve(xml);

@@ -66,7 +66,6 @@ class MapPackage {
                     if (err) throw err
                     //const result = JSON.stringify(geojson)
                     await fs.writeFile(output, geojson)
-                    console.log('done1')
                 })
             });
         })

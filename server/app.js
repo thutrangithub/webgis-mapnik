@@ -50,13 +50,12 @@ app.get('/map', (req, res) => {
   res.sendFile(path.join(__dirname, '../dist/map.html'));
 });
 
-app.get("/api/vectors/:z/:x/:y", async (req, res) => {
+app.get("/map/vectors/:z/:x/:y", async (req, res) => {
 	try {
         const db = new connectDb()
         let z = +req.params.z
         let x = +req.params.x
         let y = +req.params.y
-        // console.log(x,y,z,req)
         let input = await db.GetLinkBuffer(x,y,z)
         const buffer = await fs.readFile(input)
         res.header('Content-Type', 'application/protobuf');
@@ -71,27 +70,27 @@ app.get('/map/prerender', async(req,res)=>{
       const db = new connectDb()
       let array = []
       array = await db.GetBboxLatLon()
-      // let z = 0
-      // for(z;z<19;z++){
-        let z=17
+      let z = 0
+      for(z;z<9;z++){
       let xmax = map.GetTiles(array[2],array[0],z)[0]
       let ymin = map.GetTiles(array[2],array[0],z)[1]
       let xmin = map.GetTiles(array[3],array[1],z)[0]
       let ymax = map.GetTiles(array[3],array[1],z)[1]
-      // for(let x = xmin; x < xmax + 1; x++){
-      //     for(let y = ymin;y < ymax + 1; y++){
-        let x = xmax -1
-        let y = ymax -1
-
+      for(let x = xmin; x < xmax + 1; x++){
+          for(let y = ymin;y < ymax + 1; y++){
+            console.log(z,x,y)
               const xml = await db.callLayer('acdbase')
               await map.LoadMapFromString(xml)
               const buffer = await map.RenderVectorTile(x,y,z)
+              console.log(1)
               let output = `./server/savedpbf/${x}-${y}-${z}.pbf`
               await fs.writeFile(output,buffer)
-              await db.LinkBuffer(x,y,z,output)
-      //     }
-      // }
-      // }
+              console.log(2)
+              // await db.LinkBuffer(x,y,z,output)
+              // console.log(3)
+          }
+      }
+      }
   }catch(err) {
   res.send(err?.stack);
 }
@@ -104,7 +103,7 @@ app.use('/login', (req, res) => {
   });
 });
 
-const port = 3000;
+const port = 1234;
 // Start server tại cổng ${port}
 app.listen(port, () => {
   console.log('Server is running at http://localhost:' + port);

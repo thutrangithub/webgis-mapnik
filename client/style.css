@@ -148,10 +148,10 @@ form {
     justify-content: space-between;
     flex-direction: column;
 }
-
-.form-group {
-    background-color: #DFE0EB;
-}
+/* 
+/* .form-group {
+    background-color: #DDDDDD;
+} */ */
 
 .group-item {
     padding: 3px;
@@ -262,7 +262,7 @@ p-4 .p-4 {
 label[for] {
     cursor: pointer;
 }
-
+/* 
 .popup {
     position: absolute;
     display: none;
@@ -271,9 +271,9 @@ label[for] {
     border: 1px solid #ccc;
     border-radius: 7px;
     z-index: 9999;
-}
+} */
 
-.popup::before {
+/* .popup::before {
     content: "";
     position: absolute;
     top: 50%;
@@ -283,24 +283,20 @@ label[for] {
     border-bottom: 10px solid transparent;
     border-left: 10px solid;
     border-left-color: #ccc;
-}
-
-.popup-content {
-    display: flex;
-    justify-content: center;
-}
+} */
 
 .content-popup-class {
     margin-bottom: 7px;
 }
 
-.popup-title {
+#popup-title {
     background-color: #bfaee3;
     padding: 10px;
     font-weight: 900;
     border-radius: 5px;
     color: #fff;
     margin-bottom: 10px;
+    text-align: center;
 }
 
 .value-popup-class {
@@ -314,12 +310,63 @@ label[for] {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    background-color: #EEEEEE;
+    padding: 5px 5px 3px 5px;
+    margin-bottom: 10px;
 }
 .form-control{
     padding: 0.5rem;
     border-radius: 0.2rem;
     margin-bottom: 0.2rem;
 }
+
+.form-group input{
+    line-height: 1.5rem;
+}
+
 .d-none{
     display: none;
 }
+
+.ol-popup {
+    position: absolute;
+    background-color: white;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    padding: 5px;
+    border-radius: 10px;
+    border: 1px solid #cccccc;
+    bottom: 12px;
+    left: -50px;
+    min-width: 360px;
+    padding: 20px;
+  }
+  .ol-popup:after, .ol-popup:before {
+    top: 100%;
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+  }
+  .ol-popup:after {
+    border-top-color: white;
+    border-width: 10px;
+    left: 48px;
+    margin-left: -10px;
+  }
+  .ol-popup:before {
+    border-top-color: #cccccc;
+    border-width: 11px;
+    left: 48px;
+    margin-left: -11px;
+  }
+  .ol-popup-closer {
+    text-decoration: none;
+    position: absolute;
+    top: 2px;
+    right: 8px;
+  }
+  .ol-popup-closer:after {
+    content: "✖";
+  }
