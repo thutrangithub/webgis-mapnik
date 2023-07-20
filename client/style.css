@@ -114,7 +114,32 @@ body {
         0 2px 4px rgba(0, 0, 0, 0.2),
         0 6px 20px rgba(0, 0, 0, 0.15);
     border-radius: 10px;
-    margin: 45px auto;
+    margin: 20px auto;
+}
+
+.btn-outline {
+    text-align: center;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+  }
+
+#functions {
+    left: 0;
+    display: grid;
+    width: 90%;
+    color: #213660;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1),
+        0 2px 4px rgba(0, 0, 0, 0.2),
+        0 6px 20px rgba(0, 0, 0, 0.15);
+    border-radius: 10px;
+    padding: 10px;
+    margin: 10px auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    gap: 10px;
 
 }
 
@@ -174,7 +199,7 @@ form {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #DFE0EB;
+    background-color: #ededee;
     width: 85%;
     padding: 10px;
 }

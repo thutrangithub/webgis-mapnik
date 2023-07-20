@@ -60,38 +60,39 @@
       </div>
       
       <!-- <button type="button" class="btn btn-primary">
-        Notifications <span class="badge bg-secondary">4</span>
+        Notifications <span class="badge bg-warning">4</span>
       </button> -->
       <div id="options"></div>
       <!-- Select mode -->
-      <select id="mode" class="select-control">
+      <!-- <select id="mode" class="select-control">
         <option value="none">Chi tiết</option>
         <option value="modify"> Kéo thả </option>
         <option value="measure">Đo lường </option>
         <option value="new">Thêm địa điểm </option> 
-         <!-- <option value="draw">Vẽ một tính năng mới</option> -->
-      </select>
+         <option value="draw">Vẽ một tính năng mới</option>
+      </select> -->
 
-      <!-- <button>
-        <input type="radio" id="mode-none" name="mode" value="none" checked>
-        <label for="mode-none">Chi tiết</label>
-      </button>
-      <br>
-     <button>
-        <input type="radio" id="mode-modify" name="mode" value="modify">
-        <label for="mode-modify">Kéo thả</label>
-     </button>
-      <br>
-     <button>
-        <input type="radio" id="mode-measure" name="mode" value="measure">
-        <label for="mode-measure">Đo lường</label>
-     </button>
-      <br>
-      <button>
-        <input type="radio" id="mode-new" name="mode" value="new">
-        <label for="mode-new">Thêm địa điểm</label>
-      </button> -->
-
+      <div id="functions">
+        <input type="radio" class="btn-check" name="mode" id="danger-none-outlined" autocomplete="off" checked value="none">
+        <label class="btn btn-outline" for="danger-none-outlined">
+          <img width="30" height="30" src="https://img.icons8.com/wired/30/details-popup.png" alt="details-popup"/>
+        </label>
+  
+        <input type="radio" class="btn-check" name="mode" id="danger-modify-outlined" autocomplete="off" value="modify">
+        <label class="btn btn-outline" for="danger-modify-outlined">
+          <img width="30" height="30" src="https://img.icons8.com/ios/30/drag-and-drop.png" alt="drag-and-drop"/>
+        </label>
+  
+        <input type="radio" class="btn-check" name="mode" id="danger-measure-outlined" autocomplete="off" value="measure">
+        <label class="btn btn-outline" for="danger-measure-outlined">
+          <img width="30" height="30" src="https://img.icons8.com/ios/30/ruler.png" alt="ruler"/>
+        </label>
+  
+        <input type="radio" class="btn-check" name="mode" id="danger-new-outlined" autocomplete="off" value="new">
+        <label class="btn btn-outline" for="danger-new-outlined">
+          <img width="30" height="30" src="https://img.icons8.com/puffy/30/experimental-edit-puffy.png" alt="experimental-edit-puffy"/>
+        </label>
+      </div>
       <!-- Button save after Modifying -->
       <div id="dragged-feature-section" class="form-group" style="display: none;">
         <div id="commit"></div>
@@ -124,10 +125,10 @@
             <option value="Polygon">Vùng (Đa giác)</option>
           </select>
           </br>
-          <label for="segments" class="mb-4">Hiển thị độ dài đoạn: &nbsp;</label>
+          <label for="segments" class="mb-2">Hiển thị độ dài đoạn: &nbsp;</label>
           <input type="checkbox" id="segments" checked />
           </br>
-          <label for="clear" class="mb-4">Xóa số đo trước đó: &nbsp;</label>
+          <label for="clear" class="mb-2">Xóa số đo trước đó: &nbsp;</label>
           <input type="checkbox" id="clear" checked />
         </div>
       </form>

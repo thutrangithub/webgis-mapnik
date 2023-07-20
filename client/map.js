@@ -56,7 +56,7 @@ const source = new VectorTileSource({
 
 const source_ = new VectorTileSource({
   format: new MVT(),
-  url: "/map/vectors/4/12/7",
+  url: "/map/vectors/{z}/{x}/{y}",
 });
 
 const source__ = new VectorSource({ wrapX: false });
@@ -102,7 +102,7 @@ const layers = [
     icon: "https://img.icons8.com/office/50/mine-cart.png"
   },
   {
-    title: "Tọa độ z:x:y",
+    title: "Lưới z:x:y",
     shown: true,
     visible: true,
     layer: new TileLayer({
@@ -118,8 +118,6 @@ const layers = [
     icon: "https://img.icons8.com/external-flat-design-circle/50/external-background-camping-flat-design-circle.png"
   },
 ];
-
-// useGeographic();
 
 // defintion of the map object
 const map = new Map({
@@ -145,35 +143,27 @@ layers.forEach((l) => {
   const checkboxTitleWrapper = document.createElement("div");
   checkboxTitleWrapper.classList.add("checkbox-title-wrapper-class");
 
-  // Create the input element
   const inp = document.createElement("input");
   inp.setAttribute("type", "checkbox");
   inp.checked = l.shown;
 
-  // Apply spacing using CSS
   inp.style.marginRight = "5px";
 
-  // Create the title element
   const title = document.createElement("span");
   title.textContent = l.title;
 
-  // Add the input and title elements to the checkbox and title wrapper div
   checkboxTitleWrapper.appendChild(inp);
   checkboxTitleWrapper.appendChild(title);
 
-  // Create the icon wrapper div
   const iconWrapper = document.createElement("div");
   iconWrapper.classList.add("icon-wrapper-class");
 
-  // Create the icon element
   const icon = document.createElement("i");
   icon.classList.add("icon-class");
   icon.innerHTML = '<img src="' + l.icon + '" alt="Icon" />';
 
-  // Add the icon element to the icon wrapper div
   iconWrapper.appendChild(icon);
 
-  // Add the label to the div wrapper
   divWrapper.appendChild(checkboxTitleWrapper);
   divWrapper.appendChild(iconWrapper);
 
@@ -435,7 +425,7 @@ function handleUpEvent(evt) {
               };
 
               //fetch the modifications to the server
-              fetch('/commit/',
+              fetch('/api/modifications/drag',
                 requestOptions
               )
               webSocket.send("Database update");
@@ -490,65 +480,6 @@ function removeInteractions() {
     unByKey(listenerKey);
   }
 }
-
-const mode = document.getElementById("mode");
-
-mode?.addEventListener("change", function (e) {
-  removeInteractions();
-  const modeValue = mode.value;
-  const draggedFeatureSection = document.getElementById(
-    "dragged-feature-section"
-  );
-  // const drawFeatureSection = document.getElementById("draw-feature-section");
-
-  const measureFeatureSection = document.getElementById(
-    "measure-feature-section"
-  );
-  
-  switch (modeValue) {
-
-    case "none": {
-      draggedFeatureSection.style.display = "none";
-      // drawFeatureSection.style.display = "none"; // Hide draw-feature-section
-      measureFeatureSection.style.display = "none"; // Hide measure-feature-section
-      break;
-    }
-    case "modify": {
-      draggedFeatureSection.style.display = "block";
-      // drawFeatureSection.style.display = "none"; // Hide draw-feature-section
-      measureFeatureSection.style.display = "none"; // Hide measure-feature-section
-      map.addInteraction(drag);
-      map.removeInteraction(drawMeasure);
-      break;
-    }
-    case "measure": {
-      draggedFeatureSection.style.display = "none";
-      // drawFeatureSection.style.display = "none"; // Hide draw-feature-section
-      measureFeatureSection.style.display = "block"; // Hide measure-feature-section
-      map.removeInteraction(drawMeasure);
-      break;
-    }
-    case "new": {
-      draggedFeatureSection.style.display = "none";
-      // drawFeatureSection.style.display = "none"; // Hide draw-feature-section
-      measureFeatureSection.style.display = "none"; // Hide measure-feature-section
-      map.removeInteraction(drawMeasure);
-      break;
-    }
-    case "color": {
-      draggedFeatureSection.style.display = "none";
-      // drawFeatureSection.style.display = "none"; // Hide draw-feature-section
-      measureFeatureSection.style.display = "none"; // Hide measure-feature-section
-      break;
-    }
-    default: {
-      draggedFeatureSection.style.display = "none";
-      // drawFeatureSection.style.display = "none"; // Hide draw-feature-section
-      measureFeatureSection.style.display = "none"; // Hide measure-feature-section
-    }
-  }
-});
-
 
 // display data of the clicked vector
 
@@ -615,6 +546,34 @@ jscolor.presets.default = {
 };
 let selected = null;
 
+let mode = ''; 
+
+const defaultCheckedRadioButton = document.querySelector('input[type="radio"]:checked');
+const defaultValue = defaultCheckedRadioButton.value;
+
+if (defaultValue === 'none') {
+  mode = 'none';
+}
+
+const radioButtons = document.querySelectorAll('input[type="radio"]');
+
+radioButtons.forEach((radio) => {
+  radio.addEventListener('change', (event) => {
+    const selectedValue = event.target.value;
+
+    if (selectedValue !== mode) {
+      mode = selectedValue; 
+    } else {
+      if (selectedValue === 'none') {
+        mode = ''; 
+      }
+    }
+  });
+});
+
+
+
+
 map.on('singleclick', function (e) {
   const coordinate = e.coordinate;
 
@@ -628,7 +587,7 @@ map.on('singleclick', function (e) {
   }
   let point = map.getCoordinateFromPixel(e.pixel);
   // new feature
-  if (mode.value === "new" && point) {
+  if ( mode === "new" && point) {
     let popupContent = document.createElement("div");
 
     let divWrapper = document.createElement("div");
@@ -730,7 +689,7 @@ map.on('singleclick', function (e) {
     // handleHidePopup();
     return;
   }
-  if (mode.value !== "none") {
+  if (mode !== "none") {
     return;
   }
 
@@ -1074,6 +1033,70 @@ showSegments?.addEventListener('change', function (e) {
   vector.changed();
   drawMeasure.getOverlay().changed();
 });
+
+// handle click checkbox button icon
+document.addEventListener('DOMContentLoaded', function() {
+  var checkboxes = document.getElementsByName('mode');
+  
+  checkboxes.forEach(function(checkbox) {
+    checkbox.addEventListener('change', function() {
+      processSelectedMode(checkbox);
+    });
+  });
+});
+
+function processSelectedMode(checkbox) {
+  removeInteractions();
+    const draggedFeatureSection = document.getElementById(
+      "dragged-feature-section"
+    );
+  
+    const measureFeatureSection = document.getElementById(
+      "measure-feature-section"
+    );
+    var checkboxes = document.getElementsByName('mode');
+    
+    checkboxes.forEach(function(currentCheckbox) {
+      if (currentCheckbox !== checkbox) {
+        currentCheckbox.checked = false;
+      }
+    });
+    switch (checkbox.value) {
+      case "none": {
+                draggedFeatureSection.style.display = "none";
+                measureFeatureSection.style.display = "none"; // Hide measure-feature-section
+                break;
+              }
+              case "modify": {
+                draggedFeatureSection.style.display = "block";
+                measureFeatureSection.style.display = "none"; // Hide measure-feature-section
+                map.addInteraction(drag);
+                map.removeInteraction(drawMeasure);
+                break;
+              }
+              case "measure": {
+                draggedFeatureSection.style.display = "none";
+                measureFeatureSection.style.display = "block"; // Hide measure-feature-section
+                map.removeInteraction(drawMeasure);
+                break;
+              }
+              case "new": {
+                draggedFeatureSection.style.display = "none";
+                measureFeatureSection.style.display = "none"; // Hide measure-feature-section
+                map.removeInteraction(drawMeasure);
+                break;
+              }
+              case "color": {
+                draggedFeatureSection.style.display = "none";
+                measureFeatureSection.style.display = "none"; // Hide measure-feature-section
+                break;
+              }
+              default: {
+                draggedFeatureSection.style.display = "none";
+                measureFeatureSection.style.display = "none"; // Hide measure-feature-section
+              }
+    }
+  }
 
   const logout = (e) => {
     let token = localStorage.getItem('token');
