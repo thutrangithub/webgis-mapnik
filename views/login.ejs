@@ -38,8 +38,8 @@
 					<span class="login100-form-title p-b-10">
 						Login
 					</span>
-
-					<div class="wrap-input100 validate-input m-b-23" data-validate = "Username is reauired">
+					<div class="error-credential d-none"></div>
+					<div class="wrap-input100 validate-input m-b-23" data-validate = "Username is required">
 						<span class="label-input100">Username</span>
 						<input class="input100" type="text" name="username" placeholder="Type your username">
 						<span class="focus-input100" data-symbol="&#xf206;"></span>
@@ -84,7 +84,9 @@
 	<script src="login/vendor/countdowntime/countdowntime.js"></script>
 <!--===============================================================================================-->
 	<script src="login/js/main.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
 	<script>
+		const port = 3000;
 		const loginButton = document.getElementById("login");
 		const usernameInput = document.querySelector('input[name="username"]');
 		const passwordInput = document.querySelector('input[name="password"]');
@@ -104,28 +106,27 @@
 			// call api login
 			try{
 				const res = await login({username, password});
-				if(res.hasOwnProperty('error')){
-					return errorCredential.classList.remove('d-none');
-				}
-				// save token to storage
-				localStorage.setItem('token', JSON.stringify(res.token));
-				// redirect to map dashboard
-				window.location.href = "http://localhost:3000/map"
 			}catch (error){
 				// TypeError: Failed to fetch
 				console.log('There was an error', error);
 			}
 		});
 
-		const login = async function loginUser(credentials) {
-			return fetch('http://localhost:3000/login', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify(credentials)
+		const login = async function loginUser({username, password}) {
+			axios.get(`http://localhost:${port}/api/generate-token?username=${username}&password=${password}`)
+			.then(function (response) {
+				// save token to storage
+				localStorage.setItem('token', response.data);
+				// redirect to map dashboard
+				window.location.href = `http://localhost:${port}/map`
 			})
-			.then(data => data.json())
+			.catch(function (error) {
+				if (error.response) {
+					errorCredential.innerText = error.response.data;
+					return errorCredential.classList.remove('d-none');
+				}
+				
+			});
 		}
 	</script>
 

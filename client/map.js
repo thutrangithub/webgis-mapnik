@@ -31,6 +31,7 @@ import OSM from "ol/source/OSM.js";
 import jscolor from "./plugins/jscolor.js";
 import { fromLonLat } from "ol/proj";
 import { Overlay } from "ol";
+import constant from "../server/config/constant";
 
 // ********************************** Start coding ********************************** //
 // style definition
@@ -511,9 +512,9 @@ closer.onclick = function () {
 };
 
 const popup = new Overlay({
-  element: document.getElementById('popup'), 
-  positioning: 'bottom-center', 
-  stopEvent: false, 
+  element: document.getElementById('popup'),
+  positioning: 'bottom-center',
+  stopEvent: false,
 });
 map.addOverlay(popup);
 
@@ -533,10 +534,10 @@ const handleSetColorFeature = (e) => {
 
 // let's set defaults for all color pickers
 jscolor.presets.default = {
-  width: 141,               
-  position: 'right',        
-  previewPosition: 'right', 
-  previewSize: 40,          
+  width: 141,
+  position: 'right',
+  previewPosition: 'right',
+  previewSize: 40,
   palette: [
     '#000000', '#7d7d7d', '#870014', '#ec1c23', '#ff7e26',
     '#fef100', '#22b14b', '#00a1e7', '#3f47cc', '#a349a4',
@@ -546,7 +547,7 @@ jscolor.presets.default = {
 };
 let selected = null;
 
-let mode = ''; 
+let mode = '';
 
 const defaultCheckedRadioButton = document.querySelector('input[type="radio"]:checked');
 const defaultValue = defaultCheckedRadioButton.value;
@@ -562,10 +563,10 @@ radioButtons.forEach((radio) => {
     const selectedValue = event.target.value;
 
     if (selectedValue !== mode) {
-      mode = selectedValue; 
+      mode = selectedValue;
     } else {
       if (selectedValue === 'none') {
-        mode = ''; 
+        mode = '';
       }
     }
   });
@@ -587,7 +588,7 @@ map.on('singleclick', function (e) {
   }
   let point = map.getCoordinateFromPixel(e.pixel);
   // new feature
-  if ( mode === "new" && point) {
+  if (mode === "new" && point) {
     let popupContent = document.createElement("div");
 
     let divWrapper = document.createElement("div");
@@ -693,7 +694,7 @@ map.on('singleclick', function (e) {
     return;
   }
 
-    map.forEachFeatureAtPixel(e.pixel, function (f) {        
+  map.forEachFeatureAtPixel(e.pixel, function (f) {
 
     selected = f;
     // Tạo nội dung cho popup 
@@ -764,7 +765,7 @@ document.getElementById('popup-closer').onclick = function () {
 
 const typeSelection = document.getElementById("type");
 
-let draw; 
+let draw;
 function addInteraction() {
   const value = typeSelection?.value;
   if (value && value !== "None") {
@@ -1035,11 +1036,11 @@ showSegments?.addEventListener('change', function (e) {
 });
 
 // handle click checkbox button icon
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
   var checkboxes = document.getElementsByName('mode');
-  
-  checkboxes.forEach(function(checkbox) {
-    checkbox.addEventListener('change', function() {
+
+  checkboxes.forEach(function (checkbox) {
+    checkbox.addEventListener('change', function () {
       processSelectedMode(checkbox);
     });
   });
@@ -1047,60 +1048,64 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function processSelectedMode(checkbox) {
   removeInteractions();
-    const draggedFeatureSection = document.getElementById(
-      "dragged-feature-section"
-    );
-  
-    const measureFeatureSection = document.getElementById(
-      "measure-feature-section"
-    );
-    var checkboxes = document.getElementsByName('mode');
-    
-    checkboxes.forEach(function(currentCheckbox) {
-      if (currentCheckbox !== checkbox) {
-        currentCheckbox.checked = false;
-      }
-    });
-    switch (checkbox.value) {
-      case "none": {
-                draggedFeatureSection.style.display = "none";
-                measureFeatureSection.style.display = "none"; // Hide measure-feature-section
-                break;
-              }
-              case "modify": {
-                draggedFeatureSection.style.display = "block";
-                measureFeatureSection.style.display = "none"; // Hide measure-feature-section
-                map.addInteraction(drag);
-                map.removeInteraction(drawMeasure);
-                break;
-              }
-              case "measure": {
-                draggedFeatureSection.style.display = "none";
-                measureFeatureSection.style.display = "block"; // Hide measure-feature-section
-                map.removeInteraction(drawMeasure);
-                break;
-              }
-              case "new": {
-                draggedFeatureSection.style.display = "none";
-                measureFeatureSection.style.display = "none"; // Hide measure-feature-section
-                map.removeInteraction(drawMeasure);
-                break;
-              }
-              case "color": {
-                draggedFeatureSection.style.display = "none";
-                measureFeatureSection.style.display = "none"; // Hide measure-feature-section
-                break;
-              }
-              default: {
-                draggedFeatureSection.style.display = "none";
-                measureFeatureSection.style.display = "none"; // Hide measure-feature-section
-              }
-    }
-  }
+  const draggedFeatureSection = document.getElementById(
+    "dragged-feature-section"
+  );
 
-  const logout = (e) => {
-    let token = localStorage.getItem('token');
-    if (token) {
-      localStorage.removeItem('token');
+  const measureFeatureSection = document.getElementById(
+    "measure-feature-section"
+  );
+  var checkboxes = document.getElementsByName('mode');
+
+  checkboxes.forEach(function (currentCheckbox) {
+    if (currentCheckbox !== checkbox) {
+      currentCheckbox.checked = false;
+    }
+  });
+  switch (checkbox.value) {
+    case "none": {
+      draggedFeatureSection.style.display = "none";
+      measureFeatureSection.style.display = "none"; // Hide measure-feature-section
+      break;
+    }
+    case "modify": {
+      draggedFeatureSection.style.display = "block";
+      measureFeatureSection.style.display = "none"; // Hide measure-feature-section
+      map.addInteraction(drag);
+      map.removeInteraction(drawMeasure);
+      break;
+    }
+    case "measure": {
+      draggedFeatureSection.style.display = "none";
+      measureFeatureSection.style.display = "block"; // Hide measure-feature-section
+      map.removeInteraction(drawMeasure);
+      break;
+    }
+    case "new": {
+      draggedFeatureSection.style.display = "none";
+      measureFeatureSection.style.display = "none"; // Hide measure-feature-section
+      map.removeInteraction(drawMeasure);
+      break;
+    }
+    case "color": {
+      draggedFeatureSection.style.display = "none";
+      measureFeatureSection.style.display = "none"; // Hide measure-feature-section
+      break;
+    }
+    default: {
+      draggedFeatureSection.style.display = "none";
+      measureFeatureSection.style.display = "none"; // Hide measure-feature-section
     }
   }
+}
+
+
+const logoutButton = document.querySelector('#logout');
+logoutButton?.addEventListener('click', function (e) {
+  e.preventDefault();
+  let token = localStorage.getItem('token');
+  if (token) {
+    localStorage.removeItem('token');
+    window.location.href = `http://localhost:${constant.PORT}/`
+  }
+})
