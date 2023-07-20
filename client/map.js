@@ -23,17 +23,15 @@ import {
 import { Pointer as PointerInteraction } from "ol/interaction.js";
 import Feature from "ol/Feature.js";
 import LineString from "ol/geom/LineString.js";
-import { Point, Polygon } from "ol/geom";
+import { Point } from "ol/geom";
 import Draw from "ol/interaction/Draw.js";
 import { getArea, getLength } from "ol/sphere.js";
-import RenderFeature from "ol/render/Feature";
 import { deleteLayer, drawFeature, drawLine } from "./functions";
 import OSM from "ol/source/OSM.js";
 import jscolor from "./plugins/jscolor.js";
-import { fromLonLat, useGeographic } from "ol/proj";
+import { fromLonLat } from "ol/proj";
 import { Overlay } from "ol";
-import {toLonLat} from 'ol/proj.js';
-import {toStringHDMS} from 'ol/coordinate.js';
+
 // ********************************** Start coding ********************************** //
 // style definition
 
@@ -392,9 +390,11 @@ function handleUpEvent(evt) {
 
       //add the modification to the modifications array
       let counter = document.createElement("div");
-      counter.innerHTML = "Số feature thực hiện kéo thả: <span style='color: red'>" + modifications.length + "</span>";
-
-
+      counter.innerHTML = `
+              <button type="button" class="btn btn-info">
+                Số feature được kéo thả <span class="badge rounded-pill bg-light text-dark">${modifications.length}</span>
+              </button>
+            `;
       if (document.getElementById("commit").children.length) {
         //update the counter of modifications
         document.getElementById("commit").removeChild(document.getElementById("commit").firstChild);
@@ -442,7 +442,11 @@ function handleUpEvent(evt) {
               //clean the commit message and moficactions array
               modifications = [];
               document.getElementById("commit").removeChild(document.getElementById("commit").firstChild);
-              counter.innerHTML = "Số feature thực hiện kéo thả: <span style='color: red'>" + modifications.length + "</span>";
+              counter.innerHTML = `
+              <button type="button" class="btn btn-info">
+                Số feature được kéo thả <span class="badge rounded-pill bg-light text-dark">${modifications.length}</span>
+              </button>
+            `;
               document.getElementById("commit").prepend(counter);
               modif.value = "your commit message";
 
@@ -487,34 +491,7 @@ function removeInteractions() {
   }
 }
 
-
-// const saveButton = document.getElementById("save-button");
-// saveButton?.addEventListener("click", () => {
-//   const requestOptions = {
-//     method: "POST",
-//     headers: { "Content-Type": "application/json" },
-//     body: JSON.stringify(draggedFeatureIds),
-//   };
-
-//   fetch("/api/your-endpoint", requestOptions)
-//     .then((response) => {
-//       // Handle the response from the server
-//       if (response.ok) {
-//         // Handle success
-//         console.log("Save successful");
-//       } else {
-//         // Handle failure
-//         console.error("Save failed");
-//       }
-//     })
-//     .catch((error) => {
-//       // Error occurred
-//       console.error("An error occurred", error);
-//     });
-// });
-
 const mode = document.getElementById("mode");
-
 
 mode?.addEventListener("change", function (e) {
   removeInteractions();
@@ -522,7 +499,7 @@ mode?.addEventListener("change", function (e) {
   const draggedFeatureSection = document.getElementById(
     "dragged-feature-section"
   );
-  const drawFeatureSection = document.getElementById("draw-feature-section");
+  // const drawFeatureSection = document.getElementById("draw-feature-section");
 
   const measureFeatureSection = document.getElementById(
     "measure-feature-section"
@@ -532,13 +509,13 @@ mode?.addEventListener("change", function (e) {
 
     case "none": {
       draggedFeatureSection.style.display = "none";
-      drawFeatureSection.style.display = "none"; // Hide draw-feature-section
+      // drawFeatureSection.style.display = "none"; // Hide draw-feature-section
       measureFeatureSection.style.display = "none"; // Hide measure-feature-section
       break;
     }
     case "modify": {
       draggedFeatureSection.style.display = "block";
-      drawFeatureSection.style.display = "none"; // Hide draw-feature-section
+      // drawFeatureSection.style.display = "none"; // Hide draw-feature-section
       measureFeatureSection.style.display = "none"; // Hide measure-feature-section
       map.addInteraction(drag);
       map.removeInteraction(drawMeasure);
@@ -546,31 +523,32 @@ mode?.addEventListener("change", function (e) {
     }
     case "measure": {
       draggedFeatureSection.style.display = "none";
-      drawFeatureSection.style.display = "none"; // Hide draw-feature-section
+      // drawFeatureSection.style.display = "none"; // Hide draw-feature-section
       measureFeatureSection.style.display = "block"; // Hide measure-feature-section
       map.removeInteraction(drawMeasure);
       break;
     }
     case "new": {
       draggedFeatureSection.style.display = "none";
-      drawFeatureSection.style.display = "none"; // Hide draw-feature-section
+      // drawFeatureSection.style.display = "none"; // Hide draw-feature-section
       measureFeatureSection.style.display = "none"; // Hide measure-feature-section
       map.removeInteraction(drawMeasure);
       break;
     }
     case "color": {
       draggedFeatureSection.style.display = "none";
-      drawFeatureSection.style.display = "none"; // Hide draw-feature-section
+      // drawFeatureSection.style.display = "none"; // Hide draw-feature-section
       measureFeatureSection.style.display = "none"; // Hide measure-feature-section
       break;
     }
     default: {
       draggedFeatureSection.style.display = "none";
-      drawFeatureSection.style.display = "none"; // Hide draw-feature-section
+      // drawFeatureSection.style.display = "none"; // Hide draw-feature-section
       measureFeatureSection.style.display = "none"; // Hide measure-feature-section
     }
   }
 });
+
 
 // display data of the clicked vector
 
@@ -822,7 +800,6 @@ document.getElementById('popup-closer').onclick = function () {
   popup.setPosition(undefined);
   return false;
 };
-
 
 // Draw point, linestring, polygon, circle
 
@@ -1097,3 +1074,10 @@ showSegments?.addEventListener('change', function (e) {
   vector.changed();
   drawMeasure.getOverlay().changed();
 });
+
+  const logout = (e) => {
+    let token = localStorage.getItem('token');
+    if (token) {
+      localStorage.removeItem('token');
+    }
+  }

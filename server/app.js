@@ -51,59 +51,65 @@ app.get('/map', (req, res) => {
 });
 
 app.get("/map/vectors/:z/:x/:y", async (req, res) => {
-	try {
-        const db = new connectDb()
-        let z = +req.params.z
-        let x = +req.params.x
-        let y = +req.params.y
-        let input = await db.GetLinkBuffer(x,y,z)
-        const buffer = await fs.readFile(input)
-        res.header('Content-Type', 'application/protobuf');
-        res.send(buffer);
-	} catch(err) {
-		res.send(err?.stack);
-	}
+  try {
+    const db = new connectDb()
+    let z = +req.params.z
+    let x = +req.params.x
+    let y = +req.params.y
+    let input = await db.GetLinkBuffer(x, y, z)
+    const buffer = await fs.readFile(input)
+    res.header('Content-Type', 'application/protobuf');
+    res.send(buffer);
+  } catch (err) {
+    res.send(err?.stack);
+  }
 })
-app.get('/map/prerender', async(req,res)=>{
-  try{
-      const map = new MapPackage()
-      const db = new connectDb()
-      let array = []
-      array = await db.GetBboxLatLon()
-      let z = 0
-      for(z;z<9;z++){
-      let xmax = map.GetTiles(array[2],array[0],z)[0]
-      let ymin = map.GetTiles(array[2],array[0],z)[1]
-      let xmin = map.GetTiles(array[3],array[1],z)[0]
-      let ymax = map.GetTiles(array[3],array[1],z)[1]
-      for(let x = xmin; x < xmax + 1; x++){
-          for(let y = ymin;y < ymax + 1; y++){
-            console.log(z,x,y)
-              const xml = await db.callLayer('acdbase')
-              await map.LoadMapFromString(xml)
-              const buffer = await map.RenderVectorTile(x,y,z)
-              console.log(1)
-              let output = `./server/savedpbf/${x}-${y}-${z}.pbf`
-              await fs.writeFile(output,buffer)
-              console.log(2)
-              // await db.LinkBuffer(x,y,z,output)
-              // console.log(3)
-          }
+app.get('/map/prerender', async (req, res) => {
+  try {
+    const map = new MapPackage()
+    const db = new connectDb()
+    let array = []
+    array = await db.GetBboxLatLon()
+    let z = 0
+    for (z; z < 9; z++) {
+      let xmax = map.GetTiles(array[2], array[0], z)[0]
+      let ymin = map.GetTiles(array[2], array[0], z)[1]
+      let xmin = map.GetTiles(array[3], array[1], z)[0]
+      let ymax = map.GetTiles(array[3], array[1], z)[1]
+      for (let x = xmin; x < xmax + 1; x++) {
+        for (let y = ymin; y < ymax + 1; y++) {
+          console.log(z, x, y)
+          const xml = await db.callLayer('acdbase')
+          await map.LoadMapFromString(xml)
+          const buffer = await map.RenderVectorTile(x, y, z)
+          console.log(1)
+          let output = `./server/savedpbf/${x}-${y}-${z}.pbf`
+          await fs.writeFile(output, buffer)
+          console.log(2)
+          // await db.LinkBuffer(x,y,z,output)
+          // console.log(3)
+        }
       }
-      }
-  }catch(err) {
-  res.send(err?.stack);
-}
+    }
+  } catch (err) {
+    res.send(err?.stack);
+  }
   res.send('done')
 })
-
+const user = [
+  {
+    username: 'admin',
+    password: '12345678'
+  }
+];
 app.use('/login', (req, res) => {
   res.send({
+    success: true,
     token: 'test123'
   });
 });
 
-const port = 1234;
+const port = 8000;
 // Start server tại cổng ${port}
 app.listen(port, () => {
   console.log('Server is running at http://localhost:' + port);

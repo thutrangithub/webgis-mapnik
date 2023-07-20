@@ -85,25 +85,30 @@
 <!--===============================================================================================-->
 	<script src="login/js/main.js"></script>
 	<script>
-		let loginButton = document.getElementById("login");
+		const loginButton = document.getElementById("login");
 		const usernameInput = document.querySelector('input[name="username"]');
 		const passwordInput = document.querySelector('input[name="password"]');
+		const errorCredential = document.querySelector('.error-credential');
 		loginButton.addEventListener("click",async (e) => {
 			e.preventDefault();
 			let username = usernameInput.value;
 			let password = passwordInput.value;
 			if(!username || !password){
-				if(!username){
-					return showValidate(usernameInput);
-				}else{
+				if(!username && !password){
+					showValidate(usernameInput);
 					return showValidate(passwordInput);
+				}else{
+					return !username ? showValidate(usernameInput) : showValidate(passwordInput);
 				}
 			}
 			// call api login
 			try{
-				const {token} = await login({username, password});
+				const res = await login({username, password});
+				if(res.hasOwnProperty('error')){
+					return errorCredential.classList.remove('d-none');
+				}
 				// save token to storage
-				localStorage.setItem('token', JSON.stringify(token));
+				localStorage.setItem('token', JSON.stringify(res.token));
 				// redirect to map dashboard
 				window.location.href = "http://localhost:3000/map"
 			}catch (error){

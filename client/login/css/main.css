@@ -474,3 +474,9 @@ iframe {
     padding-right: 15px;
   }
 } 
+
+.error-credential{
+  text-align: center !important;
+  color: red;
+  display: flex;
+} 
