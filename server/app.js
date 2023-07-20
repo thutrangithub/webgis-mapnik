@@ -109,7 +109,7 @@ app.use('/login', (req, res) => {
   });
 });
 
-const port = 8000;
+const port = 3000;
 // Start server tại cổng ${port}
 app.listen(port, () => {
   console.log('Server is running at http://localhost:' + port);
